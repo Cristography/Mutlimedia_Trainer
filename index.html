@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أدوات الوسائط المتعددة - Multimedia Utilities</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🎬</span>
+                <h1>أدوات الوسائط المتعددة</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="active" data-section="home">الرئيسية</a></li>
+                    <li><a href="#animation" data-section="animation">الرسوم المتحركة</a></li>
+                    <li><a href="#colors" data-section="colors">نماذج الألوان</a></li>
+                    <li><a href="#image" data-section="image">معالجة الصور</a></li>
+                    <li><a href="#compression" data-section="compression">ضغط البيانات</a></li>
+                    <li><a href="#audio" data-section="audio">الصوت</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>أدوات حسابية للوسائط المتعددة</h2>
+                    <p>مجموعة شاملة من الأدوات والحاسبات pentru المناهج الدراسية والتطبيقات العملية</p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number">6+</span>
+                            <span class="stat-label">فئات</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">20+</span>
+                            <span class="stat-label">أدوات</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">مجاني</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="categories-grid">
+                    <a href="#animation" class="category-card" data-category="animation">
+                        <div class="category-icon">🎬</div>
+                        <h3>الرسوم المتحركة</h3>
+                        <p>حسابات الحركة البينية والتحكم بالإطارات</p>
+                    </a>
+                    <a href="#colors" class="category-card" data-category="colors">
+                        <div class="category-icon">🎨</div>
+                        <h3>نماذج الألوان</h3>
+                        <p>تحويل RGB, CMY, CMYK, YUV</p>
+                    </a>
+                    <a href="#image" class="category-card" data-category="image">
+                        <div class="category-icon">🖼️</div>
+                        <h3>معالجة الصور</h3>
+                        <p>التحويلات والتصفية والضغط</p>
+                    </a>
+                    <a href="#compression" class="category-card" data-category="compression">
+                        <div class="category-icon">📦</div>
+                        <h3>ضغط البيانات</h3>
+                        <p>RLE, Huffman, LZW, Arithmetic</p>
+                    </a>
+                    <a href="#audio" class="category-card" data-category="audio">
+                        <div class="category-icon">🔊</div>
+                        <h3>الصوت</h3>
+                        <p>حسابات معدل العينات والحجم</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Animation Section -->
+        <section class="tool-section" id="animation">
+            <div class="container">
+                <div class="section-header">
+                    <h2>الرسوم المتحركة Animation</h2>
+                    <p>حسابات الحركة البينية والإطارات</p>
+                </div>
+                <div class="tools-grid">
+                    <!-- Position Interpolation -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>حركة الموقع</h3>
+                            <span class="tool-tag">Position</span>
+                        </div>
+                        <form class="tool-form" id="positionForm">
+                            <div class="form-group">
+                                <label>الموقع الابتدائي (x, y)</label>
+                                <div class="input-row">
+                                    <input type="number" id="posX1" placeholder="x1" required>
+                                    <input type="number" id="posY1" placeholder="y1" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>الموقع النهائي (x, y)</label>
+                                <div class="input-row">
+                                    <input type="number" id="posX2" placeholder="x2" required>
+                                    <input type="number" id="posY2" placeholder="y2" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>إطار البداية</label>
+                                <input type="number" id="posFrame1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>إطار النهاية</label>
+                                <input type="number" id="posFrame2" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الإطار المطلوب</label>
+                                <input type="number" id="posFrameTarget" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="positionResult"></div>
+                    </div>
+
+                    <!-- Size Interpolation -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>تغيير الأبعاد</h3>
+                            <span class="tool-tag">Size</span>
+                        </div>
+                        <form class="tool-form" id="sizeForm">
+                            <div class="form-group">
+                                <label>الأبعاد الابتدائية (عرض, ارتفاع)</label>
+                                <div class="input-row">
+                                    <input type="number" id="sizeW1" placeholder="العرض" required>
+                                    <input type="number" id="sizeH1" placeholder="الارتفاع" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>الأبعاد النهائية (عرض, ارتفاع)</label>
+                                <div class="input-row">
+                                    <input type="number" id="sizeW2" placeholder="العرض" required>
+                                    <input type="number" id="sizeH2" placeholder="الارتفاع" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الإطارات</label>
+                                <input type="number" id="sizeFrames" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الإطار المطلوب</label>
+                                <input type="number" id="sizeFrameTarget" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="sizeResult"></div>
+                    </div>
+
+                    <!-- Rotation Interpolation -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>الدوران</h3>
+                            <span class="tool-tag">Rotation</span>
+                        </div>
+                        <form class="tool-form" id="rotationForm">
+                            <div class="form-group">
+                                <label>الزاوية الابتدائية (درجة)</label>
+                                <input type="number" id="rotAngle1" value="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>زاوية الدوران (درجة)</label>
+                                <input type="number" id="rotAngleChange" required>
+                            </div>
+                            <div class="form-group">
+                                <label>اتجاه الدوران</label>
+                                <select id="rotDirection">
+                                    <option value="cw">مع عقارب الساعة (موجب)</option>
+                                    <option value="ccw">عكس عقارب الساعة (سالب)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الإطارات</label>
+                                <input type="number" id="rotFrames" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الإطار المطلوب</label>
+                                <input type="number" id="rotFrameTarget" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="rotationResult"></div>
+                    </div>
+
+                    <!-- Color Interpolation -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>تغيير اللون</h3>
+                            <span class="tool-tag">Color</span>
+                        </div>
+                        <form class="tool-form" id="colorForm">
+                            <div class="form-group">
+                                <label>اللون الابتدائي (R, G, B)</label>
+                                <div class="input-row">
+                                    <input type="number" id="colorR1" placeholder="أحمر" min="0" max="255" required>
+                                    <input type="number" id="colorG1" placeholder="أخضر" min="0" max="255" required>
+                                    <input type="number" id="colorB1" placeholder="أزرق" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>اللون النهائي (R, G, B)</label>
+                                <div class="input-row">
+                                    <input type="number" id="colorR2" placeholder="أحمر" min="0" max="255" required>
+                                    <input type="number" id="colorG2" placeholder="أخضر" min="0" max="255" required>
+                                    <input type="number" id="colorB2" placeholder="أزرق" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الإطارات</label>
+                                <input type="number" id="colorFrames" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الإطار المطلوب</label>
+                                <input type="number" id="colorFrameTarget" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="colorResult"></div>
+                    </div>
+
+                    <!-- Opacity Interpolation -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>الشفافية</h3>
+                            <span class="tool-tag">Opacity</span>
+                        </div>
+                        <form class="tool-form" id="opacityForm">
+                            <div class="form-group">
+                                <label>القيمة الابتدائية (0-255)</label>
+                                <input type="number" id="opacity1" min="0" max="255" required>
+                            </div>
+                            <div class="form-group">
+                                <label>القيمة النهائية (0-255)</label>
+                                <input type="number" id="opacity2" min="0" max="255" required>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الإطارات</label>
+                                <input type="number" id="opacityFrames" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الإطار المطلوب</label>
+                                <input type="number" id="opacityFrameTarget" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="opacityResult"></div>
+                    </div>
+
+                    <!-- FPS Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>معدل الإطارات</h3>
+                            <span class="tool-tag">FPS</span>
+                        </div>
+                        <form class="tool-form" id="fpsForm">
+                            <div class="form-group">
+                                <label>مدة الفيديو (ثواني)</label>
+                                <input type="number" id="fpsDuration" required>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الإطارات الإجمالي</label>
+                                <input type="number" id="fpsTotal" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب FPS</button>
+                        </form>
+                        <div class="tool-result" id="fpsResult"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Color Models Section -->
+        <section class="tool-section" id="colors">
+            <div class="container">
+                <div class="section-header">
+                    <h2>نماذج الألوان Color Models</h2>
+                    <p>تحويل بين أنظمة الألوان المختلفة</p>
+                </div>
+                <div class="tools-grid">
+                    <!-- RGB to CMY -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>RGB إلى CMY</h3>
+                            <span class="tool-tag">تحويل</span>
+                        </div>
+                        <form class="tool-form" id="rgbToCmyForm">
+                            <div class="form-group">
+                                <label>قيم RGB</label>
+                                <div class="input-row">
+                                    <input type="number" id="rgbR" placeholder="R" min="0" max="255" required>
+                                    <input type="number" id="rgbG" placeholder="G" min="0" max="255" required>
+                                    <input type="number" id="rgbB" placeholder="B" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="rgbToCmyResult"></div>
+                    </div>
+
+                    <!-- CMY to RGB -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>CMY إلى RGB</h3>
+                            <span class="tool-tag">تحويل</span>
+                        </div>
+                        <form class="tool-form" id="cmyToRgbForm">
+                            <div class="form-group">
+                                <label>قيم CMY (نسبة مئوية 0-100)</label>
+                                <div class="input-row">
+                                    <input type="number" id="cmyC" placeholder="C%" min="0" max="100" required>
+                                    <input type="number" id="cmyM" placeholder="M%" min="0" max="100" required>
+                                    <input type="number" id="cmyY" placeholder="Y%" min="0" max="100" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="cmyToRgbResult"></div>
+                    </div>
+
+                    <!-- RGB to CMYK -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>RGB إلى CMYK</h3>
+                            <span class="tool-tag">تحويل</span>
+                        </div>
+                        <form class="tool-form" id="rgbToCmykForm">
+                            <div class="form-group">
+                                <label>قيم RGB</label>
+                                <div class="input-row">
+                                    <input type="number" id="rgbCmykR" placeholder="R" min="0" max="255" required>
+                                    <input type="number" id="rgbCmykG" placeholder="G" min="0" max="255" required>
+                                    <input type="number" id="rgbCmykB" placeholder="B" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="rgbToCmykResult"></div>
+                    </div>
+
+                    <!-- CMYK to RGB -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>CMYK إلى RGB</h3>
+                            <span class="tool-tag">تحويل</span>
+                        </div>
+                        <form class="tool-form" id="cmykToRgbForm">
+                            <div class="form-group">
+                                <label>قيم CMYK (نسبة مئوية 0-100)</label>
+                                <div class="input-row">
+                                    <input type="number" id="cmykC" placeholder="C%" min="0" max="100" required>
+                                    <input type="number" id="cmykM" placeholder="M%" min="0" max="100" required>
+                                    <input type="number" id="cmykY" placeholder="Y%" min="0" max="100" required>
+                                    <input type="number" id="cmykK" placeholder="K%" min="0" max="100" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="cmykToRgbResult"></div>
+                    </div>
+
+                    <!-- RGB to YUV -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>RGB إلى YUV</h3>
+                            <span class="tool-tag">تحويل</span>
+                        </div>
+                        <form class="tool-form" id="rgbToYuvForm">
+                            <div class="form-group">
+                                <label>قيم RGB</label>
+                                <div class="input-row">
+                                    <input type="number" id="yuvR" placeholder="R" min="0" max="255" required>
+                                    <input type="number" id="yuvG" placeholder="G" min="0" max="255" required>
+                                    <input type="number" id="yuvB" placeholder="B" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="rgbToYuvResult"></div>
+                    </div>
+
+                    <!-- Hex Color Picker -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>منتقي الألوان</h3>
+                            <span class="tool-tag">Hex/RGB</span>
+                        </div>
+                        <form class="tool-form" id="hexPickerForm">
+                            <div class="form-group">
+                                <label>اختر لون</label>
+                                <input type="color" id="colorPicker" value="#ff0000">
+                            </div>
+                            <div class="form-group">
+                                <label>رمز Hex</label>
+                                <input type="text" id="hexInput" placeholder="#FF0000">
+                            </div>
+                            <button type="submit" class="btn btn-primary">عرض</button>
+                        </form>
+                        <div class="tool-result" id="hexPickerResult"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Processing Section -->
+        <section class="tool-section" id="image">
+            <div class="container">
+                <div class="section-header">
+                    <h2>معالجة الصور Image Processing</h2>
+                    <p>تحويلات وتعديلات على الصور</p>
+                </div>
+                <div class="tools-grid">
+                    <!-- Image Size Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>حجم الصورة</h3>
+                            <span class="tool-tag">Storage</span>
+                        </div>
+                        <form class="tool-form" id="imageSizeForm">
+                            <div class="form-group">
+                                <label>نوع الصورة</label>
+                                <select id="imageType">
+                                    <option value="color">ملونة (24-bit)</option>
+                                    <option value="grayscale">رمادية (8-bit)</option>
+                                    <option value="binary">ثنائية (1-bit)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>الأبعاد (عرض × ارتفاع)</label>
+                                <div class="input-row">
+                                    <input type="number" id="imgWidth" placeholder="العرض" required>
+                                    <input type="number" id="imgHeight" placeholder="الارتفاع" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="imageSizeResult"></div>
+                    </div>
+
+                    <!-- Grayscale Converter -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>تحويل رمادي</h3>
+                            <span class="tool-tag">Grayscale</span>
+                        </div>
+                        <form class="tool-form" id="grayscaleForm">
+                            <div class="form-group">
+                                <label>قيم RGB</label>
+                                <div class="input-row">
+                                    <input type="number" id="grayR" placeholder="R" min="0" max="255" required>
+                                    <input type="number" id="grayG" placeholder="G" min="0" max="255" required>
+                                    <input type="number" id="grayB" placeholder="B" min="0" max="255" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">تحويل</button>
+                        </form>
+                        <div class="tool-result" id="grayscaleResult"></div>
+                    </div>
+
+                    <!-- Negative -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>قلب الصورة</h3>
+                            <span class="tool-tag">Negative</span>
+                        </div>
+                        <form class="tool-form" id="negativeForm">
+                            <div class="form-group">
+                                <label>قيمة البكسل (0-255)</label>
+                                <input type="number" id="negativeValue" min="0" max="255" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="negativeResult"></div>
+                    </div>
+
+                    <!-- Threshold Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>العتبة الثنائية</h3>
+                            <span class="tool-tag">Threshold</span>
+                        </div>
+                        <form class="tool-form" id="thresholdForm">
+                            <div class="form-group">
+                                <label>قيم البكسلات (فصل بفواصل)</label>
+                                <textarea id="thresholdPixels" placeholder="مثال: 12, 14, 28, 40, 5, 9, 15, 20, 7" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>طريقة الحساب</label>
+                                <select id="thresholdMethod">
+                                    <option value="manual">يدوي</option>
+                                    <option value="mean">الوسط الحسابي</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="manualThresholdGroup">
+                                <label>العتبة (0-255)</label>
+                                <input type="number" id="manualThreshold" value="127" min="0" max="255">
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="thresholdResult"></div>
+                    </div>
+
+                    <!-- Brightness Adjustment -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>تعديل السطوع</h3>
+                            <span class="tool-tag">Brightness</span>
+                        </div>
+                        <form class="tool-form" id="brightnessForm">
+                            <div class="form-group">
+                                <label>قيمة البكسل (0-255)</label>
+                                <input type="number" id="brightnessValue" min="0" max="255" required>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع التعديل</label>
+                                <select id="brightnessType">
+                                    <option value="increase">زيادة (+)</option>
+                                    <option value="decrease">إنقاص (-)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>قيمة التغيير (0-255)</label>
+                                <input type="number" id="brightnessChange" value="30" min="0" max="255" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="brightnessResult"></div>
+                    </div>
+
+                    <!-- Resolution Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>دقة الصورة</h3>
+                            <span class="tool-tag">Resolution</span>
+                        </div>
+                        <form class="tool-form" id="resolutionForm">
+                            <div class="form-group">
+                                <label>العرض (بكسالات)</label>
+                                <input type="number" id="resWidth" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الارتفاع (بكسالات)</label>
+                                <input type="number" id="resHeight" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="resolutionResult"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Compression Section -->
+        <section class="tool-section" id="compression">
+            <div class="container">
+                <div class="section-header">
+                    <h2>ضغط البيانات Data Compression</h2>
+                    <p>خوارزميات الضغط.lossless و.lossy</p>
+                </div>
+                <div class="tools-grid">
+                    <!-- RLE Compression -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>ضغط RLE</h3>
+                            <span class="tool-tag">RLE</span>
+                        </div>
+                        <form class="tool-form" id="rleForm">
+                            <div class="form-group">
+                                <label>البيانات المراد ضغطها</label>
+                                <input type="text" id="rleInput" placeholder="مثال: AAAAABBBCCDAA" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">ضغط</button>
+                            <button type="button" class="btn btn-secondary" id="rleDecompress">فك الضغط</button>
+                        </form>
+                        <div class="tool-result" id="rleResult"></div>
+                    </div>
+
+                    <!-- Huffman Coding -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>ترميز هوفمان</h3>
+                            <span class="tool-tag">Huffman</span>
+                        </div>
+                        <form class="tool-form" id="huffmanForm">
+                            <div class="form-group">
+                                <label>النص أو البيانات</label>
+                                <input type="text" id="huffmanInput" placeholder="مثال: ABEECBEDCBAEDDCB" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">ترميز</button>
+                        </form>
+                        <div class="tool-result" id="huffmanResult"></div>
+                    </div>
+
+                    <!-- LZW Compression -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>ضغط LZW</h3>
+                            <span class="tool-tag">LZW</span>
+                        </div>
+                        <form class="tool-form" id="lzwForm">
+                            <div class="form-group">
+                                <label>البيانات المراد ضغطها</label>
+                                <input type="text" id="lzwInput" placeholder="مثال: ABABBABCABABBA" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">ضغط</button>
+                            <button type="button" class="btn btn-secondary" id="lzwDecompress">فك الضغط</button>
+                        </form>
+                        <div class="tool-result" id="lzwResult"></div>
+                    </div>
+
+                    <!-- Arithmetic Encoding -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>الترميز الحسابي</h3>
+                            <span class="tool-tag">Arithmetic</span>
+                        </div>
+                        <form class="tool-form" id="arithmeticForm">
+                            <div class="form-group">
+                                <label>الرسالة</label>
+                                <input type="text" id="arithMessage" placeholder="مثال: abc" required>
+                            </div>
+                            <div class="form-group">
+                                <label>جدول التكرار (شكل: حرف:تكرار)</label>
+                                <input type="text" id="arithFreq" placeholder="a:2,b:7,c:1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">ترميز</button>
+                            <button type="button" class="btn btn-secondary" id="arithDecompress">فك الترميز</button>
+                        </form>
+                        <div class="tool-result" id="arithmeticResult"></div>
+                    </div>
+
+                    <!-- Compression Ratio -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>نسبة الضغط</h3>
+                            <span class="tool-tag">Ratio</span>
+                        </div>
+                        <form class="tool-form" id="compressionRatioForm">
+                            <div class="form-group">
+                                <label>حجم الملف الأصلي (بايت)</label>
+                                <input type="number" id="originalSize" required>
+                            </div>
+                            <div class="form-group">
+                                <label>حجم الملف المضغوط (بايت)</label>
+                                <input type="number" id="compressedSize" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="compressionRatioResult"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio Section -->
+        <section class="tool-section" id="audio">
+            <div class="container">
+                <div class="section-header">
+                    <h2>الصوت Audio</h2>
+                    <p>حسابات الصوت الرقمي</p>
+                </div>
+                <div class="tools-grid">
+                    <!-- Audio File Size -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>حجم ملف الصوت</h3>
+                            <span class="tool-tag">Size</span>
+                        </div>
+                        <form class="tool-form" id="audioSizeForm">
+                            <div class="form-group">
+                                <label>معدل العينة (Hz)</label>
+                                <select id="sampleRate">
+                                    <option value="44100">44.1 kHz (CD)</option>
+                                    <option value="22050">22.05 kHz</option>
+                                    <option value="11025">11.025 kHz</option>
+                                    <option value="48000">48 kHz</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>عمق العينة (بت)</label>
+                                <select id="bitDepth">
+                                    <option value="8">8 بت</option>
+                                    <option value="16" selected>16 بت</option>
+                                    <option value="24">24 بت</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>عدد القنوات</label>
+                                <select id="channels">
+                                    <option value="1">مونو (1)</option>
+                                    <option value="2" selected>ستيريو (2)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>المدة (ثواني)</label>
+                                <input type="number" id="audioDuration" step="0.1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="audioSizeResult"></div>
+                    </div>
+
+                    <!-- Duration Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>مدة التسجيل</h3>
+                            <span class="tool-tag">Duration</span>
+                        </div>
+                        <form class="tool-form" id="durationForm">
+                            <div class="form-group">
+                                <label>حجم الملف (ميجابايت)</label>
+                                <input type="number" id="fileSizeMB" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>معدل العينة (Hz)</label>
+                                <select id="durationSampleRate">
+                                    <option value="44100">44.1 kHz</option>
+                                    <option value="22050">22.05 kHz</option>
+                                    <option value="11025">11.025 kHz</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>عمق العينة (بت)</label>
+                                <select id="durationBitDepth">
+                                    <option value="8">8 بت</option>
+                                    <option value="16" selected>16 بت</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>القنوات</label>
+                                <select id="durationChannels">
+                                    <option value="1">مونو</option>
+                                    <option value="2" selected>ستيريو</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="durationResult"></div>
+                    </div>
+
+                    <!-- Bit Rate Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>معدل البت</h3>
+                            <span class="tool-tag">Bitrate</span>
+                        </div>
+                        <form class="tool-form" id="bitrateForm">
+                            <div class="form-group">
+                                <label>معدل العينة (Hz)</label>
+                                <input type="number" id="bitrateSampleRate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>عمق العينة (بت)</label>
+                                <input type="number" id="bitrateDepth" required>
+                            </div>
+                            <div class="form-group">
+                                <label>القنوات</label>
+                                <input type="number" id="bitrateChannels" value="2" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="bitrateResult"></div>
+                        </div>
+                    </div>
+
+                    <!-- dB Calculator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3>مستوى الصوت (dB)</h3>
+                            <span class="tool-tag">Decibel</span>
+                        </div>
+                        <form class="tool-form" id="dbForm">
+                            <div class="form-group">
+                                <label>نوع الحساب</label>
+                                <select id="dbType">
+                                    <option value="amplitude">من السعة</option>
+                                    <option value="power">من الطاقة</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>القيمة</label>
+                                <input type="number" id="dbValue" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">احسب</button>
+                        </form>
+                        <div class="tool-result" id="dbResult"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>أدوات الوسائط المتعددة - Multimedia Utilities © 2026</p>
+            <p>صمم لطلاب ومعلمي مادة الوسائط المتعددة</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

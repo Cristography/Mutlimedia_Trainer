@@ -1,1208 +1,1108 @@
 // Multimedia Utilities - Main Application
-// Modular Architecture for Animation, Colors, Image Processing, Compression, Audio
+// Hash-based routing for individual tool pages
 
-// ==================== MODULE: Animation ====================
-const AnimationModule = {
-    // Position Interpolation Calculator
-    calculatePosition(formData) {
-        const { x1, y1, x2, y2, frame1, frame2, targetFrame } = formData;
-        
-        const nf = frame2 - frame1;
-        const dx = (x2 - x1) / nf;
-        const dy = (y2 - y1) / nf;
-        
-        const targetX = x1 + dx * (targetFrame - frame1);
-        const targetY = y1 + dy * (targetFrame - frame1);
-        
-        return {
-            perFrame: { dx: dx.toFixed(2), dy: dy.toFixed(2) },
-            position: { x: targetX.toFixed(2), y: targetY.toFixed(2) },
-            nf: nf
-        };
-    },
-
-    // Size Interpolation Calculator
-    calculateSize(formData) {
-        const { w1, h1, w2, h2, frames, targetFrame } = formData;
-        
-        const dW = (w2 - w1) / frames;
-        const dH = (h2 - h1) / frames;
-        
-        const targetW = w1 + dW * (targetFrame - 1);
-        const targetH = h1 + dH * (targetFrame - 1);
-        
-        const area = targetW * targetH;
-        const perimeter = 2 * (targetW + targetH);
-        
-        return {
-            perFrame: { dW: dW.toFixed(2), dH: dH.toFixed(2) },
-            dimensions: { width: targetW.toFixed(2), height: targetH.toFixed(2) },
-            area: area.toFixed(2),
-            perimeter: perimeter.toFixed(2)
-        };
-    },
-
-    // Rotation Interpolation Calculator
-    calculateRotation(formData) {
-        const { angle1, angleChange, direction, frames, targetFrame } = formData;
-        
-        let finalAngle;
-        if (direction === 'cw') {
-            finalAngle = angle1 + angleChange;
-        } else {
-            finalAngle = angle1 - angleChange;
+const ToolsData = {
+    // Animation Tools
+    'tool-position': {
+        title: 'حركة الموقع',
+        tag: 'Position',
+        category: 'animation',
+        inputs: [
+            { id: 'posX1', label: 'الموقع الابتدائي x', type: 'number', placeholder: 'x1' },
+            { id: 'posY1', label: 'الموقع الابتدائي y', type: 'number', placeholder: 'y1' },
+            { id: 'posX2', label: 'الموقع النهائي x', type: 'number', placeholder: 'x2' },
+            { id: 'posY2', label: 'الموقع النهائي y', type: 'number', placeholder: 'y2' },
+            { id: 'posFrame1', label: 'إطار البداية', type: 'number', value: '1' },
+            { id: 'posFrame2', label: 'إطار النهاية', type: 'number', placeholder: '10' },
+            { id: 'posFrameTarget', label: 'الإطار المطلوب', type: 'number', placeholder: '5' }
+        ],
+        calc: (d) => {
+            const nf = d.posFrame2 - d.posFrame1;
+            const dx = (d.posX2 - d.posX1) / nf;
+            const dy = (d.posY2 - d.posY1) / nf;
+            const x = d.posX1 + dx * (d.posFrameTarget - d.posFrame1);
+            const y = d.posY1 + dy * (d.posFrameTarget - d.posFrame1);
+            return {
+                result: `(${x.toFixed(2)}, ${y.toFixed(2)})`,
+                details: [`الخطوة: dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`]
+            };
+        },
+        visual: 'animation',
+        quiz: {
+            generate: () => {
+                const x1 = Math.floor(Math.random() * 100);
+                const y1 = Math.floor(Math.random() * 100);
+                const x2 = Math.floor(Math.random() * 100) + 50;
+                const y2 = Math.floor(Math.random() * 100) + 50;
+                const f1 = 1;
+                const f2 = 10;
+                const ft = Math.floor(Math.random() * 8) + 2;
+                const nf = f2 - f1;
+                const dx = (x2 - x1) / nf;
+                const dy = (y2 - y1) / nf;
+                const ansX = (x1 + dx * (ft - f1)).toFixed(2);
+                const ansY = (y1 + dy * (ft - f1)).toFixed(2);
+                return {
+                    question: `物体从 (${x1}, ${y1}) 移动到 (${x2}, ${y2})，帧从 ${f1} 到 ${f2}，求第 ${ft} 帧的位置？`,
+                    answer: `(${ansX}, ${ansY})`,
+                    hint: `先计算每帧的变化: dx = (${x2}-${x1})/${nf} = ${dx.toFixed(2)}`
+                };
+            }
         }
-        
-        const dAngle = (finalAngle - angle1) / frames;
-        const targetAngle = angle1 + dAngle * (targetFrame - 1);
-        
-        return {
-            perFrame: dAngle.toFixed(2),
-            finalAngle: finalAngle.toFixed(2),
-            targetAngle: targetAngle.toFixed(2)
-        };
     },
 
-    // Color Interpolation Calculator
-    calculateColor(formData) {
-        const { r1, g1, b1, r2, g2, b2, frames, targetFrame } = formData;
-        
-        const dR = (r2 - r1) / frames;
-        const dG = (g2 - g1) / frames;
-        const dB = (b2 - b1) / frames;
-        
-        const targetR = Math.round(r1 + dR * (targetFrame - 1));
-        const targetG = Math.round(g1 + dG * (targetFrame - 1));
-        const targetB = Math.round(b1 + dB * (targetFrame - 1));
-        
-        const hexColor = `#${targetR.toString(16).padStart(2, '0')}${targetG.toString(16).padStart(2, '0')}${targetB.toString(16).padStart(2, '0')}`.toUpperCase();
-        
-        return {
-            perFrame: { dR: dR.toFixed(2), dG: dG.toFixed(2), dB: dB.toFixed(2) },
-            rgb: { r: targetR, g: targetG, b: targetB },
-            hex: hexColor,
-            colorPreview: `rgb(${targetR}, ${targetG}, ${targetB})`
-        };
+    'tool-size': {
+        title: 'تغيير الأبعاد',
+        tag: 'Size',
+        category: 'animation',
+        inputs: [
+            { id: 'sizeW1', label: 'العرض الابتدائي', type: 'number', placeholder: 'عرض1' },
+            { id: 'sizeH1', label: 'الارتفاع الابتدائي', type: 'number', placeholder: 'ارتفاع1' },
+            { id: 'sizeW2', label: 'العرض النهائي', type: 'number', placeholder: 'عرض2' },
+            { id: 'sizeH2', label: 'الارتفاع النهائي', type: 'number', placeholder: 'ارتفاع2' },
+            { id: 'sizeFrames', label: 'عدد الإطارات', type: 'number', placeholder: '10' },
+            { id: 'sizeFrameTarget', label: 'الإطار المطلوب', type: 'number', placeholder: '5' }
+        ],
+        calc: (d) => {
+            const dW = (d.sizeW2 - d.sizeW1) / d.sizeFrames;
+            const dH = (d.sizeH2 - d.sizeH1) / d.sizeFrames;
+            const w = d.sizeW1 + dW * (d.sizeFrameTarget - 1);
+            const h = d.sizeH1 + dH * (d.sizeFrameTarget - 1);
+            return {
+                result: `عرض: ${w.toFixed(2)}, ارتفاع: ${h.toFixed(2)}`,
+                details: [`المساحة: ${(w*h).toFixed(2)} px²`]
+            };
+        },
+        visual: 'size'
     },
 
-    // Opacity Interpolation Calculator
-    calculateOpacity(formData) {
-        const { opacity1, opacity2, frames, targetFrame } = formData;
-        
-        const dOpacity = (opacity2 - opacity1) / frames;
-        const targetOpacity = Math.round(opacity1 + dOpacity * (targetFrame - 1));
-        
-        return {
-            perFrame: dOpacity.toFixed(2),
-            targetOpacity: targetOpacity,
-            percentage: ((targetOpacity / 255) * 100).toFixed(1) + '%'
-        };
+    'tool-rotation': {
+        title: 'الدوران',
+        tag: 'Rotation',
+        category: 'animation',
+        inputs: [
+            { id: 'rotAngle1', label: 'الزاوية الابتدائية', type: 'number', value: '0' },
+            { id: 'rotAngleChange', label: 'زاوية الدوران', type: 'number', placeholder: '90' },
+            { id: 'rotDirection', label: 'الاتجاه', type: 'select', options: [
+                { value: 'cw', label: 'مع عقارب الساعة' },
+                { value: 'ccw', label: 'عكس عقارب الساعة' }
+            ]},
+            { id: 'rotFrames', label: 'عدد الإطارات', type: 'number', placeholder: '10' },
+            { id: 'rotFrameTarget', label: 'الإطار المطلوب', type: 'number', placeholder: '5' }
+        ],
+        calc: (d) => {
+            const final = d.rotDirection === 'cw' ? d.rotAngle1 + d.rotAngleChange : d.rotAngle1 - d.rotAngleChange;
+            const dAngle = (final - d.rotAngle1) / d.rotFrames;
+            const angle = d.rotAngle1 + dAngle * (d.rotFrameTarget - 1);
+            return {
+                result: `${angle.toFixed(2)}°`,
+                details: [`الدوران لكل إطار: ${dAngle.toFixed(2)}°`]
+            };
+        },
+        visual: 'rotation'
     },
 
-    // FPS Calculator
-    calculateFPS(duration, totalFrames) {
-        return totalFrames / duration;
+    'tool-color': {
+        title: 'تغيير اللون',
+        tag: 'Color',
+        category: 'animation',
+        inputs: [
+            { id: 'colorR1', label: 'اللون الابتدائي - أحمر', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'colorG1', label: 'اللون الابتدائي - أخضر', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'colorB1', label: 'اللون الابتدائي - أزرق', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'colorR2', label: 'اللون النهائي - أحمر', type: 'number', min: 0, max: 255, placeholder: '255' },
+            { id: 'colorG2', label: 'اللون النهائي - أخضر', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'colorB2', label: 'اللون النهائي - أزرق', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'colorFrames', label: 'عدد الإطارات', type: 'number', placeholder: '10' },
+            { id: 'colorFrameTarget', label: 'الإطار المطلوب', type: 'number', placeholder: '5' }
+        ],
+        calc: (d) => {
+            const dR = (d.colorR2 - d.colorR1) / d.colorFrames;
+            const dG = (d.colorG2 - d.colorG1) / d.colorFrames;
+            const dB = (d.colorB2 - d.colorB1) / d.colorFrames;
+            const r = Math.round(d.colorR1 + dR * (d.colorFrameTarget - 1));
+            const g = Math.round(d.colorG1 + dG * (d.colorFrameTarget - 1));
+            const b = Math.round(d.colorB1 + dB * (d.colorFrameTarget - 1));
+            const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`.toUpperCase();
+            return {
+                result: `RGB(${r}, ${g}, ${b}) = ${hex}`,
+                details: [],
+                colorPreview: `rgb(${r}, ${g}, ${b})`
+            };
+        },
+        visual: 'color',
+        visualType: 'color-interpolation'
+    },
+
+    'tool-opacity': {
+        title: 'الشفافية',
+        tag: 'Opacity',
+        category: 'animation',
+        inputs: [
+            { id: 'opacity1', label: 'القيمة الابتدائية', type: 'number', min: 0, max: 255, value: '0' },
+            { id: 'opacity2', label: 'القيمة النهائية', type: 'number', min: 0, max: 255, value: '255' },
+            { id: 'opacityFrames', label: 'عدد الإطارات', type: 'number', placeholder: '10' },
+            { id: 'opacityFrameTarget', label: 'الإطار المطلوب', type: 'number', placeholder: '5' }
+        ],
+        calc: (d) => {
+            const dO = (d.opacity2 - d.opacity1) / d.opacityFrames;
+            const op = Math.round(d.opacity1 + dO * (d.opacityFrameTarget - 1));
+            return {
+                result: `${op} (${((op/255)*100).toFixed(1)}%)`,
+                details: [`التغيير لكل إطار: ${dO.toFixed(2)}`]
+            };
+        },
+        visual: 'opacity'
+    },
+
+    'tool-fps': {
+        title: 'معدل الإطارات',
+        tag: 'FPS',
+        category: 'animation',
+        inputs: [
+            { id: 'fpsDuration', label: 'مدة الفيديو (ثواني)', type: 'number', placeholder: '60' },
+            { id: 'fpsTotal', label: 'عدد الإطارات الإجمالي', type: 'number', placeholder: '1800' }
+        ],
+        calc: (d) => {
+            const fps = d.fpsTotal / d.fpsDuration;
+            return { result: `${fps.toFixed(2)} FPS`, details: [] };
+        },
+        visual: 'fps'
+    },
+
+    // Color Tools
+    'tool-rgb-cmy': {
+        title: 'RGB إلى CMY',
+        tag: 'تحويل',
+        category: 'colors',
+        inputs: [
+            { id: 'rgbR', label: 'أحمر (R)', type: 'number', min: 0, max: 255, placeholder: '255' },
+            { id: 'rgbG', label: 'أخضر (G)', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'rgbB', label: 'أزرق (B)', type: 'number', min: 0, max: 255, placeholder: '0' }
+        ],
+        calc: (d) => {
+            const c = (1 - d.rgbR/255 * 100).toFixed(2);
+            const m = (1 - d.rgbG/255 * 100).toFixed(2);
+            const y = (1 - d.rgbB/255 * 100).toFixed(2);
+            return { result: `C: ${c}%, M: ${m}%, Y: ${y}%`, details: [], colorPreview: `rgb(${d.rgbR},${d.rgbG},${d.rgbB})` };
+        },
+        visual: 'color'
+    },
+
+    'tool-cmy-rgb': {
+        title: 'CMY إلى RGB',
+        tag: 'تحويل',
+        category: 'colors',
+        inputs: [
+            { id: 'cmyC', label: 'سيان (C%)', type: 'number', min: 0, max: 100, placeholder: '0' },
+            { id: 'cmyM', label: 'مجنيتا (M%)', type: 'number', min: 0, max: 100, placeholder: '100' },
+            { id: 'cmyY', label: 'أصفر (Y%)', type: 'number', min: 0, max: 100, placeholder: '0' }
+        ],
+        calc: (d) => {
+            const r = Math.round(255 * (1 - d.cmyC/100));
+            const g = Math.round(255 * (1 - d.cmyM/100));
+            const b = Math.round(255 * (1 - d.cmyY/100));
+            return { result: `R: ${r}, G: ${g}, B: ${b}`, details: [], colorPreview: `rgb(${r},${g},${b})` };
+        },
+        visual: 'color'
+    },
+
+    'tool-rgb-cmyk': {
+        title: 'RGB إلى CMYK',
+        tag: 'تحويل',
+        category: 'colors',
+        inputs: [
+            { id: 'rgbCmykR', label: 'أحمر (R)', type: 'number', min: 0, max: 255, placeholder: '255' },
+            { id: 'rgbCmykG', label: 'أخضر (G)', type: 'number', min: 0, max: 255, placeholder: '0' },
+            { id: 'rgbCmykB', label: 'أزرق (B)', type: 'number', min: 0, max: 255, placeholder: '0' }
+        ],
+        calc: (d) => {
+            let r = d.rgbCmykR/255, g = d.rgbCmykG/255, b = d.rgbCmykB/255;
+            const k = 1 - Math.max(r, g, b);
+            if (k === 1) return { result: 'C: 0%, M: 0%, Y: 0%, K: 100%', details: [] };
+            const c = ((1-r-k)/(1-k)*100).toFixed(2);
+            const m = ((1-g-k)/(1-k)*100).toFixed(2);
+            const y = ((1-b-k)/(1-k)*100).toFixed(2);
+            return { result: `C: ${c}%, M: ${m}%, Y: ${y}%, K: ${(k*100).toFixed(2)}%`, details: [] };
+        },
+        visual: 'color'
+    },
+
+    'tool-cmyk-rgb': {
+        title: 'CMYK إلى RGB',
+        tag: 'تحويل',
+        category: 'colors',
+        inputs: [
+            { id: 'cmykC', label: 'سيان (C%)', type: 'number', min: 0, max: 100, placeholder: '0' },
+            { id: 'cmykM', label: 'مجنيتا (M%)', type: 'number', min: 0, max: 100, placeholder: '100' },
+            { id: 'cmykY', label: 'أصفر (Y%)', type: 'number', min: 0, max: 100, placeholder: '0' },
+            { id: 'cmykK', label: 'أسود (K%)', type: 'number', min: 0, max: 100, placeholder: '0' }
+        ],
+        calc: (d) => {
+            const r = Math.round(255 * (1-d.cmykC/100) * (1-d.cmykK/100));
+            const g = Math.round(255 * (1-d.cmykM/100) * (1-d.cmykK/100));
+            const b = Math.round(255 * (1-d.cmykY/100) * (1-d.cmykK/100));
+            return { result: `R: ${r}, G: ${g}, B: ${b}`, details: [], colorPreview: `rgb(${r},${g},${b})` };
+        },
+        visual: 'color'
+    },
+
+    'tool-yuv': {
+        title: 'RGB إلى YUV',
+        tag: 'تحويل',
+        category: 'colors',
+        inputs: [
+            { id: 'yuvR', label: 'أحمر (R)', type: 'number', min: 0, max: 255, placeholder: '255' },
+            { id: 'yuvG', label: 'أخضر (G)', type: 'number', min: 0, max: 255, placeholder: '255' },
+            { id: 'yuvB', label: 'أزرق (B)', type: 'number', min: 0, max: 255, placeholder: '0' }
+        ],
+        calc: (d) => {
+            const y = Math.round(0.299*d.yuvR + 0.587*d.yuvG + 0.114*d.yuvB);
+            const u = Math.round((d.yuvB-y)*0.492 + 128);
+            const v = Math.round((d.yuvR-y)*0.877 + 128);
+            return { result: `Y: ${y}, U: ${u}, V: ${v}`, details: [] };
+        },
+        visual: 'color'
+    },
+
+    'tool-hex': {
+        title: 'منتقي الألوان',
+        tag: 'Hex',
+        category: 'colors',
+        inputs: [
+            { id: 'colorPicker', label: 'اختر لون', type: 'color', value: '#ff0000' },
+            { id: 'hexInput', label: 'رمز Hex', type: 'text', placeholder: '#FF0000' }
+        ],
+        calc: (d) => {
+            const hex = d.hexInput || d.colorPicker;
+            const r = parseInt(hex.slice(1,3), 16);
+            const g = parseInt(hex.slice(3,5), 16);
+            const b = parseInt(hex.slice(5,7), 16);
+            return { result: `R: ${r}, G: ${g}, B: ${b}`, details: [], colorPreview: hex };
+        },
+        visual: 'color-picker'
+    },
+
+    // Image Tools
+    'tool-image-size': {
+        title: 'حجم الصورة',
+        tag: 'Storage',
+        category: 'image',
+        inputs: [
+            { id: 'imageType', label: 'نوع الصورة', type: 'select', options: [
+                { value: 'color', label: 'ملونة (24-bit)' },
+                { value: 'grayscale', label: 'رمادية (8-bit)' },
+                { value: 'binary', label: 'ثنائية (1-bit)' }
+            ]},
+            { id: 'imgWidth', label: 'العرض (بكسالات)', type: 'number', placeholder: '1920' },
+            { id: 'imgHeight', label: 'الارتفاع (بكسالات)', type: 'number', placeholder: '1080' }
+        ],
+        calc: (d) => {
+            const bpp = d.imageType === 'color' ? 3 : d.imageType === 'grayscale' ? 1 : 0.125;
+            const bytes = d.imgWidth * d.imgHeight * bpp;
+            return { 
+                result: `${bytes.toLocaleString()} بايت = ${(bytes/1024).toFixed(2)} KB = ${(bytes/1024/1024).toFixed(4)} MB`,
+                details: [`${(d.imgWidth*d.imgHeight).toLocaleString()} بكسل`]
+            };
+        },
+        visual: 'image'
+    },
+
+    'tool-grayscale': {
+        title: 'تحويل رمادي',
+        tag: 'Grayscale',
+        category: 'image',
+        inputs: [
+            { id: 'grayR', label: 'أحمر (R)', type: 'number', min: 0, max: 255, placeholder: '128' },
+            { id: 'grayG', label: 'أخضر (G)', type: 'number', min: 0, max: 255, placeholder: '64' },
+            { id: 'grayB', label: 'أزرق (B)', type: 'number', min: 0, max: 255, placeholder: '32' }
+        ],
+        calc: (d) => {
+            const gray = Math.round(0.299*d.grayR + 0.587*d.grayG + 0.114*d.grayB);
+            return { result: `${gray}`, details: [`0.299×${d.grayR} + 0.587×${d.grayG} + 0.114×${d.grayB} = ${gray.toFixed(1)}`], colorPreview: `rgb(${gray},${gray},${gray})` };
+        },
+        visual: 'grayscale'
+    },
+
+    'tool-negative': {
+        title: 'قلب الصورة',
+        tag: 'Negative',
+        category: 'image',
+        inputs: [
+            { id: 'negativeValue', label: 'قيمة البكسل', type: 'number', min: 0, max: 255, placeholder: '128' }
+        ],
+        calc: (d) => {
+            const neg = 255 - d.negativeValue;
+            return { result: `${neg}`, details: [`255 - ${d.negativeValue} = ${neg}`], colorPreview: `rgb(${neg},${neg},${neg})` };
+        },
+        visual: 'negative'
+    },
+
+    'tool-threshold': {
+        title: 'العتبة الثنائية',
+        tag: 'Threshold',
+        category: 'image',
+        inputs: [
+            { id: 'thresholdPixels', label: 'قيم البكسلات (فصل بفواصل)', type: 'textarea', placeholder: '12, 14, 28, 40, 5, 9' },
+            { id: 'thresholdMethod', label: 'الطريقة', type: 'select', options: [
+                { value: 'manual', label: 'يدوي' },
+                { value: 'mean', label: 'الوسط الحسابي' }
+            ]},
+            { id: 'manualThreshold', label: 'العتبة (يدوي)', type: 'number', min: 0, max: 255, value: '127' }
+        ],
+        calc: (d) => {
+            const pixels = d.thresholdPixels.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+            const thresh = d.thresholdMethod === 'mean' ? pixels.reduce((a,b)=>a+b,0)/pixels.length : d.manualThreshold;
+            const binary = pixels.map(p => p >= thresh ? 1 : 0);
+            return { result: `العتبة: ${thresh.toFixed(1)} | النتيجة: ${binary.join(', ')}`, details: [`آحاد: ${binary.filter(x=>x).length}, أصفار: ${binary.filter(x=>!x).length}`] };
+        },
+        visual: 'threshold'
+    },
+
+    'tool-brightness': {
+        title: 'تعديل السطوع',
+        tag: 'Brightness',
+        category: 'image',
+        inputs: [
+            { id: 'brightnessValue', label: 'قيمة البكسل', type: 'number', min: 0, max: 255, placeholder: '100' },
+            { id: 'brightnessType', label: 'نوع التعديل', type: 'select', options: [
+                { value: 'increase', label: 'زيادة (+)' },
+                { value: 'decrease', label: 'إنقاص (-)' }
+            ]},
+            { id: 'brightnessChange', label: 'قيمة التغيير', type: 'number', min: 0, max: 255, value: '30' }
+        ],
+        calc: (d) => {
+            const result = d.brightnessType === 'increase' ? Math.min(255, d.brightnessValue + d.brightnessChange) : Math.max(0, d.brightnessValue - d.brightnessChange);
+            return { result: `${result}`, details: [`${d.brightnessValue} ${d.brightnessType === 'increase' ? '+' : '-'} ${d.brightnessChange} = ${result}`] };
+        },
+        visual: 'brightness'
+    },
+
+    'tool-resolution': {
+        title: 'دقة الصورة',
+        tag: 'Resolution',
+        category: 'image',
+        inputs: [
+            { id: 'resWidth', label: 'العرض', type: 'number', placeholder: '1920' },
+            { id: 'resHeight', label: 'الارتفاع', type: 'number', placeholder: '1080' }
+        ],
+        calc: (d) => {
+            const total = d.resWidth * d.resHeight;
+            const gcd = (a,b) => b===0 ? a : gcd(b, a%b);
+            const g = gcd(d.resWidth, d.resHeight);
+            return { result: `${total.toLocaleString()} بكسل (${(total/1000000).toFixed(2)} MP)`, details: [`نسبة العرض:الارتفاع = ${d.resWidth/g}:${d.resHeight/g}`] };
+        },
+        visual: 'resolution'
+    },
+
+    // Compression Tools
+    'tool-rle': {
+        title: 'ضغط RLE',
+        tag: 'RLE',
+        category: 'compression',
+        inputs: [
+            { id: 'rleInput', label: 'البيانات', type: 'text', placeholder: 'AAAAABBBCCDAA' }
+        ],
+        calc: (d) => {
+            let compressed = [], count = 1;
+            for (let i = 1; i <= d.rleInput.length; i++) {
+                if (i < d.rleInput.length && d.rleInput[i] === d.rleInput[i-1]) count++;
+                else { compressed.push(`${d.rleInput[i-1]}${count}`); count = 1; }
+            }
+            return { result: compressed.join(' '), details: [`Original: ${d.rleInput.length} bytes`, `Compressed: ${compressed.join('').length} bytes`, `Ratio: ${(d.rleInput.length/compressed.join('').length).toFixed(2)}`], visualData: { original: d.rleInput, compressed: compressed.join('') } };
+        },
+        visual: 'compression'
+    },
+
+    'tool-huffman': {
+        title: 'ترميز هوفمان',
+        tag: 'Huffman',
+        category: 'compression',
+        inputs: [
+            { id: 'huffmanInput', label: 'النص', type: 'text', placeholder: 'ABRAKADABRA' }
+        ],
+        calc: (d) => {
+            const freq = {};
+            for (const c of d.huffmanInput) freq[c] = (freq[c]||0) + 1;
+            const chars = Object.keys(freq).sort((a,b) => freq[a] - freq[b]);
+            const codes = {};
+            chars.forEach((c,i) => codes[c] = i.toString(2).padStart(Math.ceil(Math.log2(chars.length)), '0'));
+            let encoded = '';
+            for (const c of d.huffmanInput) encoded += codes[c];
+            return { result: encoded, details: Object.entries(codes).map(([c,code]) => `${c}: ${code}`).join(' | ') };
+        },
+        visual: 'huffman'
+    },
+
+    'tool-lzw': {
+        title: 'ضغط LZW',
+        tag: 'LZW',
+        category: 'compression',
+        inputs: [
+            { id: 'lzwInput', label: 'البيانات', type: 'text', placeholder: 'ABABBABCABABBA' }
+        ],
+        calc: (d) => {
+            const dict = {};
+            let nextCode = 256, output = [];
+            for (let i = 0; i < 256; i++) dict[String.fromCharCode(i)] = i;
+            let s = d.lzwInput[0];
+            for (let i = 1; i < d.lzwInput.length; i++) {
+                const sc = s + d.lzwInput[i];
+                if (dict[sc] !== undefined) s = sc;
+                else { output.push(dict[s]); dict[sc] = nextCode++; s = d.lzwInput[i]; }
+            }
+            output.push(dict[s]);
+            return { result: output.join(', '), details: [`Dictionary size: ${nextCode-256} entries`] };
+        },
+        visual: 'lzw'
+    },
+
+    'tool-arithmetic': {
+        title: 'الترميز الحسابي',
+        tag: 'Arithmetic',
+        category: 'compression',
+        inputs: [
+            { id: 'arithMessage', label: 'الرسالة', type: 'text', placeholder: 'abc' },
+            { id: 'arithFreq', label: 'التكرار (حرف:تكرار)', type: 'text', placeholder: 'a:2,b:7,c:1' }
+        ],
+        calc: (d) => {
+            const freq = {};
+            d.arithFreq.split(',').forEach(p => { const [c,n] = p.split(':'); freq[c.trim()] = parseInt(n); });
+            const total = Object.values(freq).reduce((a,b)=>a+b,0);
+            let prob = {}, cum = 0;
+            Object.keys(freq).sort().forEach(c => { prob[c] = {s:cum/total, e:(cum+freq[c])/total}; cum = prob[c].e; });
+            let low = 0, high = 1;
+            for (const c of d.arithMessage) { const r = high-low; high = low + r*prob[c].e; low = low + r*prob[c].s; }
+            return { result: ((low+high)/2).toFixed(8), details: [`Range: [${low.toFixed(4)}, ${high.toFixed(4)})`] };
+        },
+        visual: 'arithmetic'
+    },
+
+    'tool-compression-ratio': {
+        title: 'نسبة الضغط',
+        tag: 'Ratio',
+        category: 'compression',
+        inputs: [
+            { id: 'originalSize', label: 'الحجم الأصلي (بايت)', type: 'number', placeholder: '1000' },
+            { id: 'compressedSize', label: 'الحجم المضغوط (بايت)', type: 'number', placeholder: '400' }
+        ],
+        calc: (d) => {
+            const ratio = d.originalSize / d.compressedSize;
+            const saved = ((d.originalSize - d.compressedSize) / d.originalSize * 100).toFixed(2);
+            return { result: `${ratio.toFixed(2)}:1`, details: [`معدل الضغط: ${(d.compressedSize/d.originalSize*100).toFixed(1)}%`, `توفير: ${saved}%`] };
+        },
+        visual: 'ratio'
+    },
+
+    // Audio Tools
+    'tool-audio-size': {
+        title: 'حجم ملف الصوت',
+        tag: 'Size',
+        category: 'audio',
+        inputs: [
+            { id: 'sampleRate', label: 'معدل العينة', type: 'select', options: [
+                { value: '44100', label: '44.1 kHz (CD)' },
+                { value: '22050', label: '22.05 kHz' },
+                { value: '11025', label: '11.025 kHz' },
+                { value: '48000', label: '48 kHz' }
+            ]},
+            { id: 'bitDepth', label: 'عمق العينة', type: 'select', options: [
+                { value: '8', label: '8 بت' },
+                { value: '16', label: '16 بت' },
+                { value: '24', label: '24 بت' }
+            ]},
+            { id: 'audioChannels', label: 'القنوات', type: 'select', options: [
+                { value: '1', label: 'مونو' },
+                { value: '2', label: 'ستيريو' }
+            ]},
+            { id: 'audioDuration', label: 'المدة (ثواني)', type: 'number', step: 0.1, placeholder: '60' }
+        ],
+        calc: (d) => {
+            const bytes = d.sampleRate * (d.bitDepth/8) * d.audioChannels * d.audioDuration;
+            return { result: `${(bytes/1024/1024).toFixed(4)} MB`, details: [`${bytes.toLocaleString()} بايت`, `معدل البت: ${(d.sampleRate*d.bitDepth*d.audioChannels/1000).toFixed(0)} kbps`] };
+        },
+        visual: 'audio'
+    },
+
+    'tool-audio-duration': {
+        title: 'مدة التسجيل',
+        tag: 'Duration',
+        category: 'audio',
+        inputs: [
+            { id: 'fileSizeMB', label: 'حجم الملف (MB)', type: 'number', step: 0.01, placeholder: '10' },
+            { id: 'durationSampleRate', label: 'معدل العينة', type: 'select', options: [
+                { value: '44100', label: '44.1 kHz' },
+                { value: '22050', label: '22.05 kHz' }
+            ]},
+            { id: 'durationBitDepth', label: 'عمق العينة', type: 'select', options: [
+                { value: '8', label: '8 بت' },
+                { value: '16', label: '16 بت' }
+            ]},
+            { id: 'durationChannels', label: 'القنوات', type: 'select', options: [
+                { value: '1', label: 'مونو' },
+                { value: '2', label: 'ستيريو' }
+            ]}
+        ],
+        calc: (d) => {
+            const bytes = d.fileSizeMB * 1024 * 1024;
+            const secs = bytes / (d.durationSampleRate * (d.durationBitDepth/8) * d.durationChannels);
+            const m = Math.floor(secs/60), s = (secs%60).toFixed(1);
+            return { result: `${m}m ${s}s`, details: [`${secs.toFixed(2)} ثانية`] };
+        },
+        visual: 'audio'
+    },
+
+    'tool-bitrate': {
+        title: 'معدل البت',
+        tag: 'Bitrate',
+        category: 'audio',
+        inputs: [
+            { id: 'bitrateSampleRate', label: 'معدل العينة (Hz)', type: 'number', placeholder: '44100' },
+            { id: 'bitrateDepth', label: 'عمق العينة (بت)', type: 'number', placeholder: '16' },
+            { id: 'bitrateChannels', label: 'القنوات', type: 'number', value: '2' }
+        ],
+        calc: (d) => {
+            const bps = d.bitrateSampleRate * d.bitrateDepth * d.bitrateChannels;
+            return { result: `${(bps/1000).toFixed(0)} kbps`, details: [`${bps.toLocaleString()} bps`, `${(bps/1000000).toFixed(2)} Mbps`] };
+        },
+        visual: 'audio'
+    },
+
+    'tool-db': {
+        title: 'مستوى الصوت (dB)',
+        tag: 'Decibel',
+        category: 'audio',
+        inputs: [
+            { id: 'dbType', label: 'النوع', type: 'select', options: [
+                { value: 'amplitude', label: 'من السعة' },
+                { value: 'power', label: 'من الطاقة' }
+            ]},
+            { id: 'dbValue', label: 'القيمة', type: 'number', step: 0.01, placeholder: '10' }
+        ],
+        calc: (d) => {
+            const db = d.dbType === 'amplitude' ? 20*Math.log10(d.dbValue) : 10*Math.log10(d.dbValue);
+            return { result: `${db.toFixed(2)} dB`, details: [db > 0 ? 'مضخم' : db < 0 ? 'مضعف' : 'بدون تغيير'] };
+        },
+        visual: 'db'
     }
 };
 
-// ==================== MODULE: Color Models ====================
-const ColorModule = {
-    // RGB to CMY
-    rgbToCmy(r, g, b) {
-        const c = 1 - (r / 255);
-        const m = 1 - (g / 255);
-        const y = 1 - (b / 255);
-        return {
-            c: (c * 100).toFixed(2) + '%',
-            m: (m * 100).toFixed(2) + '%',
-            y: (y * 100).toFixed(2) + '%'
-        };
-    },
-
-    // CMY to RGB
-    cmyToRgb(c, m, y) {
-        const cfrac = c / 100;
-        const mfrac = m / 100;
-        const yfrac = y / 100;
-        
-        const r = Math.round(255 * (1 - cfrac));
-        const g = Math.round(255 * (1 - mfrac));
-        const b = Math.round(255 * (1 - yfrac));
-        
-        return { r, g, b };
-    },
-
-    // RGB to CMYK
-    rgbToCmyk(r, g, b) {
-        let rNorm = r / 255;
-        let gNorm = g / 255;
-        let bNorm = b / 255;
-        
-        const k = 1 - Math.max(rNorm, gNorm, bNorm);
-        
-        if (k === 1) {
-            return { c: 0, m: 0, y: 0, k: 100 };
-        }
-        
-        const c = ((1 - rNorm - k) / (1 - k) * 100).toFixed(2);
-        const m = ((1 - gNorm - k) / (1 - k) * 100).toFixed(2);
-        const y = ((1 - bNorm - k) / (1 - k) * 100).toFixed(2);
-        
-        return { c: c + '%', m: m + '%', y: y + '%', k: (k * 100).toFixed(2) + '%' };
-    },
-
-    // CMYK to RGB
-    cmykToRgb(c, m, y, k) {
-        const cfrac = c / 100;
-        const mfrac = m / 100;
-        const yfrac = y / 100;
-        const kfrac = k / 100;
-        
-        const r = Math.round(255 * (1 - cfrac) * (1 - kfrac));
-        const g = Math.round(255 * (1 - mfrac) * (1 - kfrac));
-        const b = Math.round(255 * (1 - yfrac) * (1 - kfrac));
-        
-        return { r, g, b };
-    },
-
-    // RGB to YUV
-    rgbToYuv(r, g, b) {
-        const y = 0.299 * r + 0.587 * g + 0.114 * b;
-        const u = (b - y) * 0.492;
-        const v = (r - y) * 0.877;
-        
-        return {
-            y: Math.round(y),
-            u: Math.round(u + 128),
-            v: Math.round(v + 128)
-        };
-    },
-
-    // Hex to RGB
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    },
-
-    // RGB to Hex
-    rgbToHex(r, g, b) {
-        return '#' + [r, g, b].map(x => {
-            const hex = Math.max(0, Math.min(255, Math.round(x))).toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
-        }).join('').toUpperCase();
-    }
-};
-
-// ==================== MODULE: Image Processing ====================
-const ImageModule = {
-    // Calculate Image Size
-    calculateSize(width, height, type) {
-        let bytesPerPixel;
-        switch(type) {
-            case 'color': bytesPerPixel = 3; break;
-            case 'grayscale': bytesPerPixel = 1; break;
-            case 'binary': bytesPerPixel = 0.125; break;
-        }
-        
-        const totalBytes = width * height * bytesPerPixel;
-        
-        return {
-            bytes: totalBytes,
-            kb: (totalBytes / 1024).toFixed(2),
-            mb: (totalBytes / (1024 * 1024)).toFixed(4)
-        };
-    },
-
-    // Convert to Grayscale
-    toGrayscale(r, g, b) {
-        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-        return {
-            value: Math.round(gray),
-            formula: `0.299×${r} + 0.587×${g} + 0.114×${b} = ${gray.toFixed(2)}`
-        };
-    },
-
-    // Negative
-    negative(value) {
-        return 255 - value;
-    },
-
-    // Threshold
-    calculateThreshold(pixels, method, manualValue) {
-        const pixelArray = pixels.split(',').map(p => parseInt(p.trim())).filter(p => !isNaN(p));
-        
-        if (pixelArray.length === 0) {
-            return { error: 'يرجى إدخال قيم صحيحة مفصولة بفواصل' };
-        }
-        
-        let threshold;
-        if (method === 'mean') {
-            const sum = pixelArray.reduce((a, b) => a + b, 0);
-            threshold = sum / pixelArray.length;
-        } else {
-            threshold = manualValue;
-        }
-        
-        const binary = pixelArray.map(p => p >= threshold ? 1 : 0);
-        
-        return {
-            threshold: threshold.toFixed(2),
-            binary: binary.join(', '),
-            original: pixelArray.join(', '),
-            '1s count': binary.filter(x => x === 1).length,
-            '0s count': binary.filter(x => x === 0).length
-        };
-    },
-
-    // Brightness Adjustment
-    adjustBrightness(value, type, change) {
-        let result;
-        if (type === 'increase') {
-            result = Math.min(255, value + change);
-        } else {
-            result = Math.max(0, value - change);
-        }
-        
-        return {
-            original: value,
-            result: result,
-            change: result - value,
-            formula: `${value} ${type === 'increase' ? '+' : '-'} ${change} = ${result}`
-        };
-    },
-
-    // Resolution
-    calculateResolution(width, height) {
-        const total = width * height;
-        const megapixels = total / 1000000;
-        
-        return {
-            total: total,
-            megapixels: megapixels.toFixed(2) + ' MP',
-            aspectRatio: this.gcd(width, height) ? `${width/this.gcd(width, height)}:${height/this.gcd(width, height)}` : 'N/A'
-        };
+// Visual Aid Renderers
+const VisualAids = {
+    color: (toolData, result) => {
+        if (!result.colorPreview) return '';
+        return `
+            <div class="visual-aid">
+                <h4>معاينة اللون</h4>
+                <div class="visual-color-preview">
+                    <div class="visual-color-box" style="background: ${result.colorPreview}"></div>
+                    <div class="visual-color-values">
+                        <div>${result.result}</div>
+                    </div>
+                </div>
+            </div>
+        `;
     },
     
-    gcd(a, b) {
-        return b === 0 ? a : this.gcd(b, a % b);
-    }
+    'color-interpolation': (toolData, result) => {
+        return `
+            <div class="visual-aid">
+                <h4>معاينة interpolating اللون</h4>
+                <div class="visual-color-preview">
+                    <div class="visual-color-box" style="background: ${result.colorPreview || '#808080'}"></div>
+                </div>
+            </div>
+        `;
+    },
+
+    animation: (toolData, result) => {
+        return `
+            <div class="visual-aid">
+                <h4>معاينة الحركة</h4>
+                <div class="visual-animation-preview">
+                    <div class="animation-demo" id="animDemo">📍</div>
+                    <div class="animation-info">
+                        ${result.details ? result.details.map(d => `<div>${d}</div>`).join('') : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    compression: (toolData, result) => {
+        if (!result.visualData) return '';
+        const { original, compressed } = result.visualData;
+        return `
+            <div class="visual-aid">
+                <h4>معاينة الضغط</h4>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Original: ${original.length} chars</div>
+                        <div style="background: var(--surface-bg); padding: 10px; border-radius: 5px; word-break: break-all;">${original}</div>
+                    </div>
+                    <div style="font-size: 2rem;">→</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Compressed: ${compressed.length} chars</div>
+                        <div style="background: var(--surface-bg); padding: 10px; border-radius: 5px; word-break: break-all;">${compressed}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    audio: () => {
+        return `
+            <div class="visual-aid">
+                <h4>معلومات الصوت</h4>
+                <div class="visual-slider">
+                    <input type="range" min="0" max="100" value="50" disabled>
+                    <span class="slider-value">🎵</span>
+                </div>
+            </div>
+        `;
+    },
+
+    default: () => ''
 };
 
-// ==================== MODULE: Compression ====================
-const CompressionModule = {
-    // RLE Compression
-    rleCompress(data) {
-        if (!data || data.length === 0) return { error: 'يرجى إدخال البيانات' };
-        
-        let compressed = [];
-        let count = 1;
-        
-        for (let i = 1; i <= data.length; i++) {
-            if (i < data.length && data[i] === data[i-1]) {
-                count++;
-            } else {
-                compressed.push(`(${data[i-1]}, ${count})`);
-                count = 1;
-            }
-        }
-        
-        return {
-            original: data,
-            compressed: compressed.join(' '),
-            originalLength: data.length,
-            compressedLength: compressed.join('').length,
-            ratio: (data.length / compressed.join('').length).toFixed(2)
-        };
-    },
-
-    rleDecompress(data) {
-        if (!data) return { error: 'يرجى إدخال البيانات' };
-        
-        try {
-            const pairs = data.match(/\([\w\s],?\s*\d+\)/g);
-            if (!pairs) return { error: 'صيغة البيانات غير صحيحة' };
-            
-            let decompressed = '';
-            pairs.forEach(pair => {
-                const match = pair.match(/\(([\w\s]),\s*(\d+)\)/);
-                if (match) {
-                    decompressed += match[1].repeat(parseInt(match[2]));
-                }
-            });
-            
-            return {
-                compressed: data,
-                decompressed: decompressed,
-                length: decompressed.length
-            };
-        } catch (e) {
-            return { error: 'خطأ في فك الضغط' };
-        }
-    },
-
-    // Huffman Coding
-    huffmanEncode(data) {
-        if (!data || data.length === 0) return { error: 'يرجى إدخال البيانات' };
-        
-        // Calculate frequency
-        const freq = {};
-        for (const char of data) {
-            freq[char] = (freq[char] || 0) + 1;
-        }
-        
-        // Build Huffman tree (simplified)
-        const codes = {};
-        const chars = Object.keys(freq).sort((a, b) => freq[a] - freq[b]);
-        
-        if (chars.length === 1) {
-            codes[chars[0]] = '1';
-        } else if (chars.length === 2) {
-            codes[chars[0]] = '0';
-            codes[chars[1]] = '1';
-        } else {
-            // Simple assignment for demonstration
-            chars.forEach((char, index) => {
-                codes[char] = index.toString(2).padStart(Math.ceil(Math.log2(chars.length)), '0');
-            });
-        }
-        
-        // Encode
-        let encoded = '';
-        for (const char of data) {
-            encoded += codes[char];
-        }
-        
-        return {
-            frequency: freq,
-            codes: codes,
-            encoded: encoded,
-            originalBits: data.length * 8,
-            encodedBits: encoded.length,
-            ratio: (data.length * 8 / encoded.length).toFixed(2)
-        };
-    },
-
-    // LZW Compression
-    lzwCompress(data) {
-        if (!data || data.length === 0) return { error: 'يرجى إدخال البيانات' };
-        
-        const dictionary = {};
-        let nextCode = 4;
-        let output = [];
-        
-        // Initialize dictionary
-        for (let i = 0; i < 256; i++) {
-            dictionary[String.fromCharCode(i)] = i;
-        }
-        
-        let s = data[0];
-        
-        for (let i = 1; i < data.length; i++) {
-            const c = data[i];
-            const sc = s + c;
-            
-            if (dictionary.hasOwnProperty(sc)) {
-                s = sc;
-            } else {
-                output.push(dictionary[s]);
-                dictionary[sc] = nextCode++;
-                s = c;
-            }
-        }
-        
-        if (s) {
-            output.push(dictionary[s]);
-        }
-        
-        return {
-            original: data,
-            compressed: output.join(', '),
-            dictionary: Object.keys(dictionary).slice(0, 20).map(k => `${k}: ${dictionary[k]}`),
-            originalLength: data.length,
-            compressedLength: output.length
-        };
-    },
-
-    lzwDecompress(data) {
-        if (!data) return { error: 'يرجى إدخال البيانات' };
-        
-        try {
-            const codes = data.split(',').map(c => parseInt(c.trim()));
-            const dictionary = {};
-            let nextCode = 256;
-            
-            // Initialize reverse dictionary
-            for (let i = 0; i < 256; i++) {
-                dictionary[i] = String.fromCharCode(i);
-            }
-            
-            let output = '';
-            let s = dictionary[codes[0]];
-            output += s;
-            
-            for (let i = 1; i < codes.length; i++) {
-                const code = codes[i];
-                let entry;
-                
-                if (dictionary.hasOwnProperty(code)) {
-                    entry = dictionary[code];
-                } else if (code === nextCode) {
-                    entry = s + s[0];
-                }
-                
-                output += entry;
-                dictionary[nextCode++] = s + entry[0];
-                s = entry;
-            }
-            
-            return {
-                compressed: data,
-                decompressed: output,
-                length: output.length
-            };
-        } catch (e) {
-            return { error: 'خطأ في فك الضغط' };
-        }
-    },
-
-    // Arithmetic Encoding (simplified)
-    arithmeticEncode(message, freqStr) {
-        if (!message || !freqStr) return { error: 'يرجى إدخال الرسالة وجدول التكرار' };
-        
-        try {
-            // Parse frequency
-            const freq = {};
-            const pairs = freqStr.split(',');
-            pairs.forEach(p => {
-                const [char, count] = p.trim().split(':');
-                freq[char.trim()] = parseInt(count);
-            });
-            
-            // Calculate probabilities
-            const total = Object.values(freq).reduce((a, b) => a + b, 0);
-            const prob = {};
-            let cumulative = 0;
-            
-            Object.keys(freq).sort().forEach(char => {
-                prob[char] = { start: cumulative, end: cumulative + freq[char] / total };
-                cumulative = prob[char].end;
-            });
-            
-            // Encode
-            let low = 0, high = 1;
-            for (const char of message) {
-                const range = high - low;
-                high = low + range * prob[char].end;
-                low = low + range * prob[char].start;
-            }
-            
-            const encoded = (low + high) / 2;
-            
-            return {
-                message: message,
-                encoded: encoded.toFixed(10),
-                probabilities: prob,
-                range: `[${low.toFixed(6)}, ${high.toFixed(6)})`
-            };
-        } catch (e) {
-            return { error: 'خطأ في الترميز: ' + e.message };
-        }
-    },
-
-    // Compression Ratio
-    calculateRatio(original, compressed) {
-        const ratio = original / compressed;
-        const rate = (compressed / original * 100).toFixed(2);
-        
-        return {
-            ratio: ratio.toFixed(2) + ':1',
-            rate: rate + '%',
-            saved: ((original - compressed) / original * 100).toFixed(2) + '%'
-        };
-    }
-};
-
-// ==================== MODULE: Audio ====================
-const AudioModule = {
-    // Calculate File Size
-    calculateFileSize(sampleRate, bitDepth, channels, duration) {
-        const bytes = (sampleRate * (bitDepth / 8) * channels * duration);
-        
-        return {
-            bytes: bytes.toFixed(0),
-            kb: (bytes / 1024).toFixed(2),
-            mb: (bytes / (1024 * 1024)).toFixed(4),
-            gb: (bytes / (1024 * 1024 * 1024)).toFixed(6)
-        };
-    },
-
-    // Calculate Duration
-    calculateDuration(fileSizeMB, sampleRate, bitDepth, channels) {
-        const bytes = fileSizeMB * 1024 * 1024;
-        const seconds = bytes / (sampleRate * (bitDepth / 8) * channels);
-        
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = (seconds % 60).toFixed(2);
-        
-        return {
-            seconds: seconds.toFixed(2),
-            formatted: hours > 0 ? `${hours}h ${minutes}m ${secs}s` : `${minutes}m ${secs}s`
-        };
-    },
-
-    // Calculate Bitrate
-    calculateBitrate(sampleRate, bitDepth, channels) {
-        const bitrate = sampleRate * bitDepth * channels;
-        
-        return {
-            bps: bitrate.toLocaleString(),
-            kbps: (bitrate / 1000).toFixed(2),
-            mbps: (bitrate / 1000000).toFixed(2)
-        };
-    },
-
-    // dB Calculator
-    calculateDB(value, type) {
-        let db;
-        if (type === 'amplitude') {
-            db = 20 * Math.log10(value);
-        } else {
-            db = 10 * Math.log10(value);
-        }
-        
-        return {
-            input: value,
-            result: db.toFixed(2) + ' dB',
-            description: db > 0 ? 'مضخم' : db < 0 ? 'مضعف' : 'بدون تغيير'
-        };
-    }
-};
-
-// ==================== UI CONTROLLER ====================
-class UIController {
+// App Router
+class App {
     constructor() {
+        this.currentTool = null;
         this.init();
     }
 
     init() {
+        window.addEventListener('hashchange', () => this.handleRoute());
+        this.handleRoute();
         this.setupNavigation();
-        this.setupForms();
-        this.setupColorPicker();
-        this.setupThresholdMethod();
+        this.renderAllToolsInline();
+    }
+
+    renderAllToolsInline() {
+        const container = document.getElementById('allToolsContainer');
+        if (!container) return;
+
+        const categoryOrder = ['animation', 'colors', 'image', 'compression', 'audio'];
+        const categoryNames = {
+            'animation': '🎬 الرسوم المتحركة',
+            'colors': '🎨 نماذج الألوان',
+            'image': '🖼️ معالجة الصور',
+            'compression': '📦 ضغط البيانات',
+            'audio': '🔊 الصوت'
+        };
+
+        let html = '';
+        
+        categoryOrder.forEach(category => {
+            const toolsInCategory = Object.entries(ToolsData).filter(([id, tool]) => tool.category === category);
+            if (toolsInCategory.length === 0) return;
+
+            html += `<div class="index-section">
+                <h3 class="index-title">${categoryNames[category]}</h3>`;
+
+            toolsInCategory.forEach(([toolId, tool]) => {
+                const formHtml = this.generateInlineToolForm(toolId, tool);
+                html += `
+                    <div class="inline-tool-card" id="card-${toolId}">
+                        <div class="inline-tool-header" onclick="toggleToolCard('${toolId}')">
+                            <h3>${tool.title} <span class="tool-tag">${tool.tag}</span></h3>
+                            <span class="tool-toggle-icon">▼</span>
+                        </div>
+                        <div class="inline-tool-body">
+                            <div class="inline-tool-content">
+                                <div class="inline-tool-form-area">${formHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    generateInlineToolForm(toolId, tool) {
+        let formHtml = `<form class="inline-tool-form" id="form-${toolId}">`;
+
+        tool.inputs.forEach(input => {
+            if (input.type === 'select') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <select id="${toolId}-${input.id}">
+                            ${input.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (input.type === 'textarea') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <textarea id="${toolId}-${input.id}" placeholder="${input.placeholder || ''}" rows="2"></textarea>
+                    </div>
+                `;
+            } else if (input.type === 'color') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <input type="color" id="${toolId}-${input.id}" value="${input.value || '#ff0000'}">
+                    </div>
+                `;
+            } else {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <input type="${input.type}" id="${toolId}-${input.id}" 
+                            ${input.placeholder ? `placeholder="${input.placeholder}"` : ''}
+                            ${input.value !== undefined ? `value="${input.value}"` : ''}
+                            ${input.min !== undefined ? `min="${input.min}"` : ''}
+                            ${input.max !== undefined ? `max="${input.max}"` : ''}
+                            ${input.step !== undefined ? `step="${input.step}"` : ''}>
+                    </div>
+                `;
+            }
+        });
+
+        formHtml += `
+            <button type="submit" class="btn btn-primary">احسب</button>
+        </form>
+        <div class="inline-tool-result" id="result-${toolId}">
+            <div class="result-value">أدخل القيم واضغط احسب</div>
+        </div>
+        <div class="inline-tool-quiz">
+            <h4>📝 اختبار ذاتي:</h4>
+            <p id="q-${toolId}">اضغط "سؤال جديد" للبدء</p>
+            <div class="quiz-input">
+                <input type="text" id="ans-${toolId}" placeholder="أدخل إجابتك">
+                <button type="button" class="btn btn-primary" onclick="checkQuiz('${toolId}')">تحقق</button>
+            </div>
+            <div class="quiz-result" id="res-${toolId}"></div>
+            <button type="button" class="btn btn-secondary" onclick="generateQuiz('${toolId}')">سؤال جديد</button>
+        </div>
+        `;
+
+        return formHtml;
+    }
+
+    setupInlineToolEvents() {
+        Object.keys(ToolsData).forEach(toolId => {
+            const form = document.getElementById(`form-${toolId}`);
+            if (!form) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.calculateInlineTool(toolId);
+            });
+        });
+    }
+
+    calculateInlineTool(toolId) {
+        const tool = ToolsData[toolId];
+        if (!tool) return;
+
+        const data = {};
+        tool.inputs.forEach(input => {
+            const el = document.getElementById(`${toolId}-${input.id}`);
+            if (el) {
+                data[input.id] = input.type === 'number' ? parseFloat(el.value) : el.value;
+            }
+        });
+
+        const result = tool.calc(data);
+        const resultEl = document.getElementById(`result-${toolId}`);
+        
+        if (resultEl) {
+            let html = `<div class="result-value">${result.result}</div>`;
+            if (result.details && result.details.length) {
+                result.details.forEach(d => {
+                    html += `<div class="result-value" style="font-size: 0.9rem; color: var(--text-secondary);">${d}</div>`;
+                });
+            }
+            resultEl.innerHTML = html;
+        }
+    }
+
+    generateInlineQuiz(toolId) {
+        const tool = ToolsData[toolId];
+        let currentQ = null;
+
+        if (tool && tool.quiz && tool.quiz.generate) {
+            currentQ = tool.quiz.generate();
+        } else {
+            currentQ = window.QuizManager.generate(toolId);
+        }
+
+        const qEl = document.getElementById(`q-${toolId}`);
+        const resEl = document.getElementById(`res-${toolId}`);
+        const ansEl = document.getElementById(`ans-${toolId}`);
+
+        if (qEl) qEl.textContent = currentQ.question;
+        if (resEl) {
+            resEl.className = 'quiz-result';
+            resEl.textContent = '';
+        }
+        if (ansEl) ansEl.value = '';
+
+        window[`currentQuiz_${toolId}`] = currentQ;
+    }
+
+    checkInlineQuiz(toolId) {
+        const currentQ = window[`currentQuiz_${toolId}`];
+        const ansEl = document.getElementById(`ans-${toolId}`);
+        const resEl = document.getElementById(`res-${toolId}`);
+
+        if (!currentQ || !ansEl || !resEl) return;
+
+        const userAns = ansEl.value.trim().toLowerCase();
+        const correctAns = currentQ.answer.toString().toLowerCase().trim();
+
+        if (userAns === correctAns) {
+            resEl.className = 'quiz-result correct';
+            resEl.innerHTML = '✓ إجابة صحيحة!<br><small>' + (currentQ.hint || '') + '</small>';
+        } else {
+            resEl.className = 'quiz-result wrong';
+            resEl.innerHTML = '✗ الإجابة الصحيحة: ' + currentQ.answer + '<br><small>' + (currentQ.hint || '') + '</small>';
+        }
+    }
+
+    handleRoute() {
+        const hash = window.location.hash;
+        const homeSection = document.getElementById('home');
+        const toolsIndex = document.getElementById('toolsIndex');
+        const allToolsSection = document.getElementById('allToolsSection');
+        const toolPage = document.getElementById('toolPage');
+
+        // Hide all sections first
+        homeSection.style.display = 'none';
+        toolsIndex.style.display = 'none';
+        allToolsSection.style.display = 'none';
+        toolPage.style.display = 'none';
+
+        if (hash === '' || hash === '#' || hash === '#home') {
+            homeSection.style.display = 'block';
+            toolsIndex.style.display = 'block';
+            allToolsSection.style.display = 'block';
+        } else if (hash.startsWith('#tool-')) {
+            const toolId = hash.substring(1);
+            if (ToolsData[toolId]) {
+                this.loadTool(toolId);
+                toolPage.style.display = 'block';
+            }
+        }
+        
+        // Update nav active state
+        document.querySelectorAll('.nav-home').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === (hash || '#')) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    loadTool(toolId) {
+        const tool = ToolsData[toolId];
+        if (!tool) return;
+
+        this.currentTool = toolId;
+        
+        // Update page title
+        document.getElementById('toolPageTitle').textContent = tool.title;
+
+        // Generate form HTML
+        let formHtml = `
+            <div class="tool-card">
+                <div class="tool-header">
+                    <h3>${tool.title}</h3>
+                    <span class="tool-tag">${tool.tag}</span>
+                </div>
+                <form class="tool-form" id="toolForm">
+        `;
+
+        tool.inputs.forEach(input => {
+            if (input.type === 'select') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <select id="${input.id}">
+                            ${input.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (input.type === 'textarea') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <textarea id="${input.id}" placeholder="${input.placeholder || ''}" rows="3"></textarea>
+                    </div>
+                `;
+            } else if (input.type === 'color') {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <input type="color" id="${input.id}" value="${input.value || '#ff0000'}">
+                    </div>
+                `;
+            } else {
+                formHtml += `
+                    <div class="form-group">
+                        <label>${input.label}</label>
+                        <input type="${input.type}" id="${input.id}" 
+                            ${input.placeholder ? `placeholder="${input.placeholder}"` : ''}
+                            ${input.value !== undefined ? `value="${input.value}"` : ''}
+                            ${input.min !== undefined ? `min="${input.min}"` : ''}
+                            ${input.max !== undefined ? `max="${input.max}"` : ''}
+                            ${input.step !== undefined ? `step="${input.step}"` : ''}
+                            required>
+                    </div>
+                `;
+            }
+        });
+
+        formHtml += `
+                    <button type="submit" class="btn btn-primary">احسب</button>
+                </form>
+                <div class="tool-result" id="toolResult">
+                    <div class="result-label">النتيجة</div>
+                    <div class="result-value">أدخل القيم واضغط احسب</div>
+                </div>
+            </div>
+        `;
+
+        // Add visual aid section
+        const visualAid = VisualAids[tool.visual] || VisualAids.default;
+        const visualHtml = `
+            <div class="tool-sidebar">
+                ${visualAid(tool, {})}
+            </div>
+        `;
+
+        document.getElementById('toolContainer').innerHTML = formHtml + visualHtml;
+
+        // Setup form handler
+        document.getElementById('toolForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = {};
+            tool.inputs.forEach(input => {
+                data[input.id] = input.type === 'number' || input.type === 'range' ? 
+                    parseFloat(document.getElementById(input.id).value) : 
+                    document.getElementById(input.id).value;
+            });
+
+            const result = tool.calc(data);
+            const resultEl = document.getElementById('toolResult');
+            
+            let html = `<div class="result-label">النتيجة</div><div class="result-value highlight">${result.result}</div>`;
+            if (result.details && result.details.length) {
+                result.details.forEach(d => {
+                    html += `<div class="result-value">${d}</div>`;
+                });
+            }
+            resultEl.innerHTML = html;
+
+            // Update visual aid if applicable
+            if (tool.visual && VisualAids[tool.visual]) {
+                const visualEl = document.querySelector('.visual-aid');
+                if (visualEl) {
+                    const newVisual = VisualAids[tool.visual](tool, result);
+                    if (newVisual) {
+                        visualEl.outerHTML = newVisual;
+                    }
+                }
+            }
+        });
+
+        // Setup quiz for this tool
+        this.setupToolQuiz(toolId);
+    }
+
+    setupToolQuiz(toolId) {
+        const quizToggle = document.getElementById('quizToggle');
+        const quizContent = document.getElementById('quizContent');
+        const quizNext = document.getElementById('quizNext');
+        const quizSubmit = document.getElementById('quizSubmit');
+        const quizAnswer = document.getElementById('quizAnswer');
+        const quizResult = document.getElementById('quizResult');
+        const qText = document.getElementById('qText');
+
+        if (!quizToggle) return;
+
+        let currentQ = null;
+
+        quizToggle.addEventListener('click', () => {
+            quizContent.classList.toggle('active');
+            quizToggle.classList.toggle('active');
+        });
+
+        quizNext.addEventListener('click', () => {
+            currentQ = window.QuizManager.generate(toolId);
+            qText.textContent = currentQ.question;
+            quizAnswer.value = '';
+            quizResult.className = 'quiz-result';
+            quizResult.textContent = '';
+        });
+
+        quizSubmit.addEventListener('click', () => {
+            if (!currentQ) return;
+            const userAns = quizAnswer.value.trim().toLowerCase();
+            const correctAns = currentQ.answer.toString().toLowerCase().trim();
+            
+            if (userAns === correctAns) {
+                quizResult.className = 'quiz-result correct';
+                quizResult.innerHTML = '✓ إجابة صحيحة!<br><small>' + (currentQ.hint || '') + '</small>';
+            } else {
+                quizResult.className = 'quiz-result wrong';
+                quizResult.innerHTML = '✗ الإجابة الصحيحة: ' + currentQ.answer + '<br><small>' + (currentQ.hint || '') + '</small>';
+            }
+        });
+        
+        quizNext.click();
     }
 
     setupNavigation() {
         const navToggle = document.getElementById('navToggle');
         const navMenu = document.getElementById('navMenu');
-        const navLinks = document.querySelectorAll('.nav-menu a');
-        
+
         navToggle.addEventListener('click', () => {
             navMenu.classList.toggle('active');
         });
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                const section = link.getAttribute('data-section');
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                navMenu.classList.remove('active');
-                
-                if (section !== 'home') {
-                    document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-home').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    navMenu.classList.remove('active');
                 }
             });
         });
 
-        // Category cards navigation
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                const category = card.getAttribute('data-category');
-                document.getElementById(category).scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-    }
-
-    setupForms() {
-        // Animation Forms
-        this.setupPositionForm();
-        this.setupSizeForm();
-        this.setupRotationForm();
-        this.setupColorForm();
-        this.setupOpacityForm();
-        this.setupFPSForm();
-
-        // Color Forms
-        this.setupRgbToCmyForm();
-        this.setupCmyToRgbForm();
-        this.setupRgbToCmykForm();
-        this.setupCmykToRgbForm();
-        this.setupRgbToYuvForm();
-        this.setupHexPickerForm();
-
-        // Image Forms
-        this.setupImageSizeForm();
-        this.setupGrayscaleForm();
-        this.setupNegativeForm();
-        this.setupThresholdForm();
-        this.setupBrightnessForm();
-        this.setupResolutionForm();
-
-        // Compression Forms
-        this.setupRleForm();
-        this.setupHuffmanForm();
-        this.setupLzwForm();
-        this.setupArithmeticForm();
-        this.setupCompressionRatioForm();
-
-        // Audio Forms
-        this.setupAudioSizeForm();
-        this.setupDurationForm();
-        this.setupBitrateForm();
-        this.setupDbForm();
-    }
-
-    // Animation Handlers
-    setupPositionForm() {
-        document.getElementById('positionForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = {
-                x1: parseFloat(document.getElementById('posX1').value),
-                y1: parseFloat(document.getElementById('posY1').value),
-                x2: parseFloat(document.getElementById('posX2').value),
-                y2: parseFloat(document.getElementById('posY2').value),
-                frame1: parseInt(document.getElementById('posFrame1').value),
-                frame2: parseInt(document.getElementById('posFrame2').value),
-                targetFrame: parseInt(document.getElementById('posFrameTarget').value)
-            };
-            
-            const result = AnimationModule.calculatePosition(formData);
-            document.getElementById('positionResult').innerHTML = `
-                <div class="result-label">التغيير لكل إطار</div>
-                <div class="result-value">dx = ${result.perFrame.dx}, dy = ${result.perFrame.dy}</div>
-                <div class="result-label" style="margin-top: 10px;">الموقع في الإطار ${formData.targetFrame}</div>
-                <div class="result-value highlight">(${result.position.x}, ${result.position.y})</div>
-            `;
-        });
-    }
-
-    setupSizeForm() {
-        document.getElementById('sizeForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = {
-                w1: parseFloat(document.getElementById('sizeW1').value),
-                h1: parseFloat(document.getElementById('sizeH1').value),
-                w2: parseFloat(document.getElementById('sizeW2').value),
-                h2: parseFloat(document.getElementById('sizeH2').value),
-                frames: parseInt(document.getElementById('sizeFrames').value),
-                targetFrame: parseInt(document.getElementById('sizeFrameTarget').value)
-            };
-            
-            const result = AnimationModule.calculateSize(formData);
-            document.getElementById('sizeResult').innerHTML = `
-                <div class="result-label">التغيير لكل إطار</div>
-                <div class="result-value">العرض: ${result.perFrame.dW}, الارتفاع: ${result.perFrame.dH}</div>
-                <div class="result-label" style="margin-top: 10px;">الأبعاد في الإطار ${formData.targetFrame}</div>
-                <div class="result-value highlight">عرض: ${result.dimensions.width}, ارتفاع: ${result.dimensions.height}</div>
-                <div class="result-label" style="margin-top: 10px;">المساحة: ${result.area} px² | المحيط: ${result.perimeter} px</div>
-            `;
-        });
-    }
-
-    setupRotationForm() {
-        document.getElementById('rotationForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = {
-                angle1: parseFloat(document.getElementById('rotAngle1').value),
-                angleChange: parseFloat(document.getElementById('rotAngleChange').value),
-                direction: document.getElementById('rotDirection').value,
-                frames: parseInt(document.getElementById('rotFrames').value),
-                targetFrame: parseInt(document.getElementById('rotFrameTarget').value)
-            };
-            
-            const result = AnimationModule.calculateRotation(formData);
-            document.getElementById('rotationResult').innerHTML = `
-                <div class="result-label">التغيير لكل إطار</div>
-                <div class="result-value">${result.perFrame}°</div>
-                <div class="result-label" style="margin-top: 10px;">الزاوية في الإطار ${formData.targetFrame}</div>
-                <div class="result-value highlight">${result.targetAngle}°</div>
-                <div class="result-label">الزاوية النهائية: ${result.finalAngle}°</div>
-            `;
-        });
-    }
-
-    setupColorForm() {
-        document.getElementById('colorForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = {
-                r1: parseInt(document.getElementById('colorR1').value),
-                g1: parseInt(document.getElementById('colorG1').value),
-                b1: parseInt(document.getElementById('colorB1').value),
-                r2: parseInt(document.getElementById('colorR2').value),
-                g2: parseInt(document.getElementById('colorG2').value),
-                b2: parseInt(document.getElementById('colorB2').value),
-                frames: parseInt(document.getElementById('colorFrames').value),
-                targetFrame: parseInt(document.getElementById('colorFrameTarget').value)
-            };
-            
-            const result = AnimationModule.calculateColor(formData);
-            document.getElementById('colorResult').innerHTML = `
-                <div class="result-label">التغيير لكل إطار</div>
-                <div class="result-value">R: ${result.perFrame.dR}, G: ${result.perFrame.dG}, B: ${result.perFrame.dB}</div>
-                <div class="result-label" style="margin-top: 10px;">اللون في الإطار ${formData.targetFrame}</div>
-                <div class="result-value highlight" style="color: ${result.colorPreview}">RGB(${result.rgb.r}, ${result.rgb.g}, ${result.rgb.b}) = ${result.hex}</div>
-            `;
-        });
-    }
-
-    setupOpacityForm() {
-        document.getElementById('opacityForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = {
-                opacity1: parseInt(document.getElementById('opacity1').value),
-                opacity2: parseInt(document.getElementById('opacity2').value),
-                frames: parseInt(document.getElementById('opacityFrames').value),
-                targetFrame: parseInt(document.getElementById('opacityFrameTarget').value)
-            };
-            
-            const result = AnimationModule.calculateOpacity(formData);
-            document.getElementById('opacityResult').innerHTML = `
-                <div class="result-label">التغيير لكل إطار</div>
-                <div class="result-value">${result.perFrame}</div>
-                <div class="result-label" style="margin-top: 10px;">الشفافية في الإطار ${formData.targetFrame}</div>
-                <div class="result-value highlight">${result.targetOpacity} (${result.percentage})</div>
-            `;
-        });
-    }
-
-    setupFPSForm() {
-        document.getElementById('fpsForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const duration = parseFloat(document.getElementById('fpsDuration').value);
-            const totalFrames = parseInt(document.getElementById('fpsTotal').value);
-            
-            const fps = AnimationModule.calculateFPS(duration, totalFrames);
-            document.getElementById('fpsResult').innerHTML = `
-                <div class="result-value highlight">${fps.toFixed(2)} FPS</div>
-            `;
-        });
-    }
-
-    // Color Handlers
-    setupRgbToCmyForm() {
-        document.getElementById('rgbToCmyForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const r = parseInt(document.getElementById('rgbR').value);
-            const g = parseInt(document.getElementById('rgbG').value);
-            const b = parseInt(document.getElementById('rgbB').value);
-            
-            const result = ColorModule.rgbToCmy(r, g, b);
-            document.getElementById('rgbToCmyResult').innerHTML = `
-                <div class="result-label">CMY</div>
-                <div class="result-value highlight">C: ${result.c}, M: ${result.m}, Y: ${result.y}</div>
-            `;
-        });
-    }
-
-    setupCmyToRgbForm() {
-        document.getElementById('cmyToRgbForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const c = parseFloat(document.getElementById('cmyC').value);
-            const m = parseFloat(document.getElementById('cmyM').value);
-            const y = parseFloat(document.getElementById('cmyY').value);
-            
-            const result = ColorModule.cmyToRgb(c, m, y);
-            document.getElementById('cmyToRgbResult').innerHTML = `
-                <div class="result-label">RGB</div>
-                <div class="result-value highlight">R: ${result.r}, G: ${result.g}, B: ${result.b}</div>
-            `;
-        });
-    }
-
-    setupRgbToCmykForm() {
-        document.getElementById('rgbToCmykForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const r = parseInt(document.getElementById('rgbCmykR').value);
-            const g = parseInt(document.getElementById('rgbCmykG').value);
-            const b = parseInt(document.getElementById('rgbCmykB').value);
-            
-            const result = ColorModule.rgbToCmyk(r, g, b);
-            document.getElementById('rgbToCmykResult').innerHTML = `
-                <div class="result-label">CMYK</div>
-                <div class="result-value highlight">C: ${result.c}, M: ${result.m}, Y: ${result.y}, K: ${result.k}</div>
-            `;
-        });
-    }
-
-    setupCmykToRgbForm() {
-        document.getElementById('cmykToRgbForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const c = parseFloat(document.getElementById('cmykC').value);
-            const m = parseFloat(document.getElementById('cmykM').value);
-            const y = parseFloat(document.getElementById('cmykY').value);
-            const k = parseFloat(document.getElementById('cmykK').value);
-            
-            const result = ColorModule.cmykToRgb(c, m, y, k);
-            document.getElementById('cmykToRgbResult').innerHTML = `
-                <div class="result-label">RGB</div>
-                <div class="result-value highlight">R: ${result.r}, G: ${result.g}, B: ${result.b}</div>
-            `;
-        });
-    }
-
-    setupRgbToYuvForm() {
-        document.getElementById('rgbToYuvForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const r = parseInt(document.getElementById('yuvR').value);
-            const g = parseInt(document.getElementById('yuvG').value);
-            const b = parseInt(document.getElementById('yuvB').value);
-            
-            const result = ColorModule.rgbToYuv(r, g, b);
-            document.getElementById('rgbToYuvResult').innerHTML = `
-                <div class="result-label">YUV</div>
-                <div class="result-value highlight">Y: ${result.y}, U: ${result.u}, V: ${result.v}</div>
-            `;
-        });
-    }
-
-    setupColorPicker() {
-        const colorPicker = document.getElementById('colorPicker');
-        const hexInput = document.getElementById('hexInput');
-        
-        colorPicker.addEventListener('input', (e) => {
-            hexInput.value = e.target.value.toUpperCase();
-        });
-        
-        document.getElementById('hexPickerForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const hex = document.getElementById('hexInput').value;
-            const result = ColorModule.hexToRgb(hex);
-            
-            if (result) {
-                document.getElementById('hexPickerResult').innerHTML = `
-                    <div class="result-label">RGB</div>
-                    <div class="result-value highlight">R: ${result.r}, G: ${result.g}, B: ${result.b}</div>
-                    <div style="margin-top: 10px; padding: 10px; background: ${hex}; border-radius: 5px; text-align: center; color: white; font-weight: bold;">${hex}</div>
-                `;
-            } else {
-                document.getElementById('hexPickerResult').innerHTML = '<div class="error">صيغة Hex غير صحيحة</div>';
-            }
-        });
-    }
-
-    // Image Processing Handlers
-    setupImageSizeForm() {
-        document.getElementById('imageSizeForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const width = parseInt(document.getElementById('imgWidth').value);
-            const height = parseInt(document.getElementById('imgHeight').value);
-            const type = document.getElementById('imageType').value;
-            
-            const result = ImageModule.calculateSize(width, height, type);
-            document.getElementById('imageSizeResult').innerHTML = `
-                <div class="result-label">حجم الملف</div>
-                <div class="result-value">${result.bytes} بايت</div>
-                <div class="result-value highlight">${result.kb} KB</div>
-                <div class="result-value">${result.mb} MB</div>
-            `;
-        });
-    }
-
-    setupGrayscaleForm() {
-        document.getElementById('grayscaleForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const r = parseInt(document.getElementById('grayR').value);
-            const g = parseInt(document.getElementById('grayG').value);
-            const b = parseInt(document.getElementById('grayB').value);
-            
-            const result = ImageModule.toGrayscale(r, g, b);
-            document.getElementById('grayscaleResult').innerHTML = `
-                <div class="result-label">القيمة الرمادية</div>
-                <div class="result-value highlight">${result.value}</div>
-                <div class="result-label" style="margin-top: 5px; font-size: 0.8rem;">${result.formula}</div>
-            `;
-        });
-    }
-
-    setupNegativeForm() {
-        document.getElementById('negativeForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const value = parseInt(document.getElementById('negativeValue').value);
-            
-            const result = ImageModule.negative(value);
-            document.getElementById('negativeResult').innerHTML = `
-                <div class="result-label">القيمة الجديدة (255 - ${value})</div>
-                <div class="result-value highlight">${result}</div>
-            `;
-        });
-    }
-
-    setupThresholdMethod() {
-        const methodSelect = document.getElementById('thresholdMethod');
-        const manualGroup = document.getElementById('manualThresholdGroup');
-        
-        methodSelect.addEventListener('change', (e) => {
-            manualGroup.style.display = e.target.value === 'manual' ? 'block' : 'none';
-        });
-    }
-
-    setupThresholdForm() {
-        document.getElementById('thresholdForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const pixels = document.getElementById('thresholdPixels').value;
-            const method = document.getElementById('thresholdMethod').value;
-            const manualValue = parseInt(document.getElementById('manualThreshold').value);
-            
-            const result = ImageModule.calculateThreshold(pixels, method, manualValue);
-            
-            if (result.error) {
-                document.getElementById('thresholdResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('thresholdResult').innerHTML = `
-                    <div class="result-label">العتبة: ${result.threshold}</div>
-                    <div class="result-label">القيم الثنائية</div>
-                    <div class="result-value">${result.binary}</div>
-                    <div class="result-label" style="margin-top: 5px;">أصفار: ${result['0s count']} | آحاد: ${result['1s count']}</div>
-                `;
-            }
-        });
-    }
-
-    setupBrightnessForm() {
-        document.getElementById('brightnessForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const value = parseInt(document.getElementById('brightnessValue').value);
-            const type = document.getElementById('brightnessType').value;
-            const change = parseInt(document.getElementById('brightnessChange').value);
-            
-            const result = ImageModule.adjustBrightness(value, type, change);
-            document.getElementById('brightnessResult').innerHTML = `
-                <div class="result-label">النتيجة</div>
-                <div class="result-value highlight">${result.result}</div>
-                <div class="result-label">${result.formula}</div>
-            `;
-        });
-    }
-
-    setupResolutionForm() {
-        document.getElementById('resolutionForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const width = parseInt(document.getElementById('resWidth').value);
-            const height = parseInt(document.getElementById('resHeight').value);
-            
-            const result = ImageModule.calculateResolution(width, height);
-            document.getElementById('resolutionResult').innerHTML = `
-                <div class="result-label">إجمالي البكسالات</div>
-                <div class="result-value">${result.total.toLocaleString()}</div>
-                <div class="result-value highlight">${result.megapixels}</div>
-                <div class="result-label">نسبة العرض:الارتفاع = ${result.aspectRatio}</div>
-            `;
-        });
-    }
-
-    // Compression Handlers
-    setupRleForm() {
-        document.getElementById('rleForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = document.getElementById('rleInput').value;
-            const result = CompressionModule.rleCompress(data);
-            
-            if (result.error) {
-                document.getElementById('rleResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('rleResult').innerHTML = `
-                    <div class="result-label">البيانات المضغوطة</div>
-                    <div class="result-value">${result.compressed}</div>
-                    <div class="result-label" style="margin-top: 5px;">نسبة الضغط: ${result.ratio}</div>
-                `;
-            }
-        });
-
-        document.getElementById('rleDecompress').addEventListener('click', () => {
-            const data = document.getElementById('rleInput').value;
-            const result = CompressionModule.rleDecompress(data);
-            
-            if (result.error) {
-                document.getElementById('rleResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('rleResult').innerHTML = `
-                    <div class="result-label">البيانات الأصلية</div>
-                    <div class="result-value">${result.decompressed}</div>
-                `;
-            }
-        });
-    }
-
-    setupHuffmanForm() {
-        document.getElementById('huffmanForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = document.getElementById('huffmanInput').value;
-            const result = CompressionModule.huffmanEncode(data);
-            
-            if (result.error) {
-                document.getElementById('huffmanResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                let codesHtml = '';
-                for (const [char, code] of Object.entries(result.codes)) {
-                    codesHtml += `<span>${char}: ${code}</span> `;
-                }
-                
-                document.getElementById('huffmanResult').innerHTML = `
-                    <div class="result-label">الترميز</div>
-                    <div class="result-value" style="font-size: 0.85rem;">${codesHtml}</div>
-                    <div class="result-label" style="margin-top: 5px;">النتيجة</div>
-                    <div class="result-value highlight">${result.encoded}</div>
-                    <div class="result-label">نسبة الضغط: ${result.ratio}</div>
-                `;
-            }
-        });
-    }
-
-    setupLzwForm() {
-        document.getElementById('lzwForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = document.getElementById('lzwInput').value;
-            const result = CompressionModule.lzwCompress(data);
-            
-            if (result.error) {
-                document.getElementById('lzwResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('lzwResult').innerHTML = `
-                    <div class="result-label">البيانات المضغوطة</div>
-                    <div class="result-value">${result.compressed}</div>
-                `;
-            }
-        });
-
-        document.getElementById('lzwDecompress').addEventListener('click', () => {
-            const data = document.getElementById('lzwInput').value;
-            const result = CompressionModule.lzwDecompress(data);
-            
-            if (result.error) {
-                document.getElementById('lzwResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('lzwResult').innerHTML = `
-                    <div class="result-label">البيانات الأصلية</div>
-                    <div class="result-value">${result.decompressed}</div>
-                `;
-            }
-        });
-    }
-
-    setupArithmeticForm() {
-        document.getElementById('arithmeticForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const message = document.getElementById('arithMessage').value;
-            const freq = document.getElementById('arithFreq').value;
-            
-            const result = CompressionModule.arithmeticEncode(message, freq);
-            
-            if (result.error) {
-                document.getElementById('arithmeticResult').innerHTML = `<div class="error">${result.error}</div>`;
-            } else {
-                document.getElementById('arithmeticResult').innerHTML = `
-                    <div class="result-label">القيمة المشفرة</div>
-                    <div class="result-value highlight">${result.encoded}</div>
-                    <div class="result-label">المدى: ${result.range}</div>
-                `;
-            }
-        });
-
-        document.getElementById('arithDecompress').addEventListener('click', () => {
-            document.getElementById('arithmeticResult').innerHTML = '<div class="error">يتطلب تنفيذ فك الترميز الحسابي</div>';
-        });
-    }
-
-    setupCompressionRatioForm() {
-        document.getElementById('compressionRatioForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const original = parseFloat(document.getElementById('originalSize').value);
-            const compressed = parseFloat(document.getElementById('compressedSize').value);
-            
-            const result = CompressionModule.calculateRatio(original, compressed);
-            document.getElementById('compressionRatioResult').innerHTML = `
-                <div class="result-label">نسبة الضغط</div>
-                <div class="result-value highlight">${result.ratio}</div>
-                <div class="result-label">معدل الضغط: ${result.rate}</div>
-                <div class="result-label">التوفير: ${result.saved}</div>
-            `;
-        });
-    }
-
-    // Audio Handlers
-    setupAudioSizeForm() {
-        document.getElementById('audioSizeForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const sampleRate = parseInt(document.getElementById('sampleRate').value);
-            const bitDepth = parseInt(document.getElementById('bitDepth').value);
-            const channels = parseInt(document.getElementById('channels').value);
-            const duration = parseFloat(document.getElementById('audioDuration').value);
-            
-            const result = AudioModule.calculateFileSize(sampleRate, bitDepth, channels, duration);
-            document.getElementById('audioSizeResult').innerHTML = `
-                <div class="result-label">حجم الملف</div>
-                <div class="result-value">${result.bytes} بايت</div>
-                <div class="result-value">${result.kb} KB</div>
-                <div class="result-value highlight">${result.mb} MB</div>
-            `;
-        });
-    }
-
-    setupDurationForm() {
-        document.getElementById('durationForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const fileSizeMB = parseFloat(document.getElementById('fileSizeMB').value);
-            const sampleRate = parseInt(document.getElementById('durationSampleRate').value);
-            const bitDepth = parseInt(document.getElementById('durationBitDepth').value);
-            const channels = parseInt(document.getElementById('durationChannels').value);
-            
-            const result = AudioModule.calculateDuration(fileSizeMB, sampleRate, bitDepth, channels);
-            document.getElementById('durationResult').innerHTML = `
-                <div class="result-label">مدة التسجيل</div>
-                <div class="result-value highlight">${result.formatted}</div>
-                <div class="result-value">${result.seconds} ثانية</div>
-            `;
-        });
-    }
-
-    setupBitrateForm() {
-        document.getElementById('bitrateForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const sampleRate = parseInt(document.getElementById('bitrateSampleRate').value);
-            const bitDepth = parseInt(document.getElementById('bitrateDepth').value);
-            const channels = parseInt(document.getElementById('bitrateChannels').value);
-            
-            const result = AudioModule.calculateBitrate(sampleRate, bitDepth, channels);
-            document.getElementById('bitrateResult').innerHTML = `
-                <div class="result-label">معدل البت</div>
-                <div class="result-value highlight">${result.kbps} kbps</div>
-                <div class="result-value">${result.bps} bps</div>
-            `;
-        });
-    }
-
-    setupDbForm() {
-        document.getElementById('dbForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const value = parseFloat(document.getElementById('dbValue').value);
-            const type = document.getElementById('dbType').value;
-            
-            const result = AudioModule.calculateDB(value, type);
-            document.getElementById('dbResult').innerHTML = `
-                <div class="result-label">النتيجة</div>
-                <div class="result-value highlight">${result.result}</div>
-                <div class="result-label">${result.description}</div>
-            `;
-        });
+        this.setupInlineToolEvents();
     }
 }
 
-// Initialize on DOM Ready
+function toggleToolCard(toolId) {
+    const card = document.getElementById(`card-${toolId}`);
+    if (card) {
+        card.classList.toggle('expanded');
+    }
+}
+
+function generateQuiz(toolId) {
+    const app = window.appInstance;
+    if (app) {
+        app.generateInlineQuiz(toolId);
+    }
+}
+
+function checkQuiz(toolId) {
+    const app = window.appInstance;
+    if (app) {
+        app.checkInlineQuiz(toolId);
+    }
+}
+
+// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    new UIController();
+    window.appInstance = new App();
 });

@@ -75,7 +75,7 @@ class QuizManager {
         const ansY = (y1 + dy * (ft - f1)).toFixed(2);
 
         return {
-            question: `物体从 (${x1}, ${y1}) 移动到 (${x2}, ${y2})，帧从 ${f1} 到 ${f2}，求第 ${ft} 帧的位置？`,
+            question: `An object moves from (${x1}, ${y1}) to (${x2}, ${y2}) over frames ${f1} to ${f2}. What is the position at frame ${ft}?`,
             answer: `(${ansX}, ${ansY})`,
             hint: `dx = (${x2}-${x1})/${nf} = ${dx.toFixed(2)}, dy = (${y2}-${y1})/${nf} = ${dy.toFixed(2)}`
         };
@@ -94,9 +94,9 @@ class QuizManager {
         const h = (h1 + dH * (ft - 1)).toFixed(2);
 
         return {
-            question: `尺寸从 ${w1}x${h1} 变到 ${w2}x${h2}，帧 1-${frames}，求第 ${ft} 帧的尺寸？`,
+            question: `Size changes from ${w1}x${h1} to ${w2}x${h2} over frames 1-${frames}. What is the size at frame ${ft}?`,
             answer: `${w}, ${h}`,
-            hint: `每帧变化: dW=${dW.toFixed(2)}, dH=${dH.toFixed(2)}`
+            hint: `Per-frame change: dW=${dW.toFixed(2)}, dH=${dH.toFixed(2)}`
         };
     }
 
@@ -109,9 +109,9 @@ class QuizManager {
         const ans = (a1 + dAngle * (ft - 1)).toFixed(2);
 
         return {
-            question: `从 ${a1}° 旋转到 ${a2}°，帧 1-${frames}，求第 ${ft} 帧角度？`,
+            question: `Rotation from ${a1} to ${a2} degrees over frames 1-${frames}. What is the angle at frame ${ft}?`,
             answer: ans,
-            hint: `每帧旋转: ${dAngle.toFixed(2)}°`
+            hint: `Per-frame rotation: ${dAngle.toFixed(2)} degrees`
         };
     }
 
@@ -132,9 +132,9 @@ class QuizManager {
         const b = Math.round(b1 + dB * (ft - 1));
 
         return {
-            question: `RGB从 (${r1},${g1},${b1}) 到 (${r2},${g2},${b2})，帧 1-${frames}，求第 ${ft} 帧？`,
+            question: `RGB changes from (${r1},${g1},${b1}) to (${r2},${g2},${b2}) over frames 1-${frames}. What is the RGB at frame ${ft}?`,
             answer: `${r}, ${g}, ${b}`,
-            hint: `每帧变化: dR=${dR.toFixed(1)}, dG=${dG.toFixed(1)}, dB=${dB.toFixed(1)}`
+            hint: `Per-frame change: dR=${dR.toFixed(1)}, dG=${dG.toFixed(1)}, dB=${dB.toFixed(1)}`
         };
     }
 
@@ -147,9 +147,9 @@ class QuizManager {
         const ans = Math.round(o1 + dO * (ft - 1));
 
         return {
-            question: `透明度从 ${o1} 变到 ${o2}，帧 1-${frames}，求第 ${ft} 帧值？`,
+            question: `Opacity changes from ${o1} to ${o2} over frames 1-${frames}. What is the value at frame ${ft}?`,
             answer: ans.toString(),
-            hint: `每帧变化: ${dO.toFixed(2)}`
+            hint: `Per-frame change: ${dO.toFixed(2)}`
         };
     }
 
@@ -159,7 +159,7 @@ class QuizManager {
         const total = duration * fps;
 
         return {
-            question: `${duration}秒视频，共 ${total} 帧，FPS是多少？`,
+            question: `A ${duration} second video has ${total} frames. What is the FPS?`,
             answer: fps.toString(),
             hint: `${total}/${duration} = FPS`
         };
@@ -175,7 +175,7 @@ class QuizManager {
         const y = (1 - b/255 * 100).toFixed(2);
 
         return {
-            question: `RGB(${r}, ${g}, ${b}) in CMY？`,
+            question: `Convert RGB(${r}, ${g}, ${b}) to CMY?`,
             answer: `${c}, ${m}, ${y}`,
             hint: `C=1-R/255, M=1-G/255, Y=1-B/255`
         };
@@ -190,7 +190,7 @@ class QuizManager {
         const b = Math.round(255 * (1 - y/100));
 
         return {
-            question: `CMY(${c}%, ${m}%, ${y}%) in RGB？`,
+            question: `Convert CMY(${c}%, ${m}%, ${y}%) to RGB?`,
             answer: `${r}, ${g}, ${b}`,
             hint: `R=255*(1-C/100)`
         };
@@ -203,7 +203,7 @@ class QuizManager {
         let r1 = r/255, g1 = g/255, b1 = b/255;
         const k = 1 - Math.max(r1, g1, b1);
         if (k === 1) {
-            return { question: `RGB(${r}, ${g}, ${b}) in CMYK？`, answer: `0, 0, 0, 100`, hint: `全黑` };
+            return { question: `Convert RGB(${r}, ${g}, ${b}) to CMYK?`, answer: `0, 0, 0, 100`, hint: `Pure black` };
         }
         const c = ((1-r1-k)/(1-k)*100).toFixed(2);
         const m = ((1-g1-k)/(1-k)*100).toFixed(2);
@@ -211,7 +211,7 @@ class QuizManager {
         const kp = (k*100).toFixed(2);
 
         return {
-            question: `RGB(${r}, ${g}, ${b}) in CMYK？`,
+            question: `Convert RGB(${r}, ${g}, ${b}) to CMYK?`,
             answer: `${c}, ${m}, ${y}, ${kp}`,
             hint: `K=1-max(R,G,B)`
         };
@@ -227,7 +227,7 @@ class QuizManager {
         const b = Math.round(255 * (1-y/100) * (1-k/100));
 
         return {
-            question: `CMYK(${c}, ${m}, ${y}, ${k}) in RGB？`,
+            question: `Convert CMYK(${c}, ${m}, ${y}, ${k}) to RGB?`,
             answer: `${r}, ${g}, ${b}`,
             hint: `R=255*(1-C)*(1-K)`
         };
@@ -242,7 +242,7 @@ class QuizManager {
         const v = Math.round((r-y)*0.877 + 128);
 
         return {
-            question: `RGB(${r}, ${g}, ${b}) in YUV，求Y值？`,
+            question: `Convert RGB(${r}, ${g}, ${b}) to YUV. What is the Y value?`,
             answer: y.toString(),
             hint: `Y = 0.299*R + 0.587*G + 0.114*B`
         };
@@ -255,9 +255,9 @@ class QuizManager {
         const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`.toUpperCase();
 
         return {
-            question: `${hex} 的 RGB 值是多少？`,
+            question: `What is the RGB value of ${hex}?`,
             answer: `${r}, ${g}, ${b}`,
-            hint: `Hex转RGB: 每一位16进制转10进制`
+            hint: `Hex to RGB: each hex pair to decimal`
         };
     }
 
@@ -270,14 +270,15 @@ class QuizManager {
         const h = heights[idx];
         const types = ['color', 'grayscale', 'binary'];
         const type = types[this.rand(0, 2)];
+        const typeName = type === 'color' ? '24-bit color' : type === 'grayscale' ? '8-bit grayscale' : '1-bit binary';
         const bpp = type === 'color' ? 3 : type === 'grayscale' ? 1 : 0.125;
         const bytes = w * h * bpp;
         const mb = (bytes/1024/1024).toFixed(2);
 
         return {
-            question: `${w}x${h} ${type === 'color' ? '24位彩色' : type === 'grayscale' ? '8位灰度' : '1位二值'} 图片大小(MB)？`,
+            question: `What is the file size (MB) of a ${w}x${h} ${typeName} image?`,
             answer: mb,
-            hint: `宽*高*${bpp}字节 /1024/1024`
+            hint: `W*H*${bpp} bytes /1024/1024`
         };
     }
 
@@ -288,7 +289,7 @@ class QuizManager {
         const gray = Math.round(0.299*r + 0.587*g + 0.114*b);
 
         return {
-            question: `RGB(${r}, ${g}, ${b}) 转换为灰度值？`,
+            question: `Convert RGB(${r}, ${g}, ${b}) to grayscale value?`,
             answer: gray.toString(),
             hint: `0.299*R + 0.587*G + 0.114*B`
         };
@@ -299,7 +300,7 @@ class QuizManager {
         const ans = 255 - v;
 
         return {
-            question: `像素值 ${v} 的负值是多少？`,
+            question: `What is the negative of pixel value ${v}?`,
             answer: ans.toString(),
             hint: `255 - ${v}`
         };
@@ -310,9 +311,9 @@ class QuizManager {
         const avg = pixels.reduce((a,b) => a+b, 0) / pixels.length;
 
         return {
-            question: `像素值 [${pixels.join(', ')}] 的平均值（阈值）是多少？`,
+            question: `What is the average (threshold) of pixel values [${pixels.join(', ')}]?`,
             answer: avg.toFixed(1),
-            hint: `和除以数量`
+            hint: `Sum divided by count`
         };
     }
 
@@ -323,7 +324,7 @@ class QuizManager {
         const ans = type === 'increase' ? Math.min(255, v + change) : Math.max(0, v - change);
 
         return {
-            question: `像素值 ${v}，${type === 'increase' ? '增加' : '减少'} ${change} 后是多少？`,
+            question: `Pixel value is ${v}. After ${type === 'increase' ? 'increasing' : 'decreasing'} by ${change}, what is the result?`,
             answer: ans.toString(),
             hint: type === 'increase' ? `min(255, ${v}+${change})` : `max(0, ${v}-${change})`
         };
@@ -338,7 +339,7 @@ class QuizManager {
         const total = w * h;
 
         return {
-            question: `分辨率 ${w}x${h}，总像素数是多少？`,
+            question: `Resolution is ${w}x${h}. What is the total pixel count?`,
             answer: total.toLocaleString(),
             hint: `${w} * ${h}`
         };
@@ -354,9 +355,9 @@ class QuizManager {
         const input = c1.repeat(n1) + c2.repeat(n2);
 
         return {
-            question: `数据 "${input}" 使用RLE压缩？`,
+            question: `Compress "${input}" using RLE?`,
             answer: `${c1}${n1}${c2}${n2}`,
-            hint: `字符 + 重复次数`
+            hint: `Character + repeat count`
         };
     }
 
@@ -366,9 +367,9 @@ class QuizManager {
         const freqA = text.split(chars[0]).length - 1;
 
         return {
-            question: `文本 "${text}" 中字符 ${chars[0]} 出现几次？`,
+            question: `How many times does character "${chars[0]}" appear in "${text}"?`,
             answer: freqA.toString(),
-            hint: `统计出现次数`
+            hint: `Count occurrences`
         };
     }
 
@@ -377,9 +378,9 @@ class QuizManager {
         const input = chars[0] + chars[1] + chars[0] + chars[1];
 
         return {
-            question: `数据 "${input}" LZW压缩输出（前4个）？`,
+            question: `What is the LZW compressed output for "${input}" (first 4 codes)?`,
             answer: `${chars[0].charCodeAt(0)}, ${chars[1].charCodeAt(0)}, ${chars[0].charCodeAt(0)}, ${chars[1].charCodeAt(0)}`,
-            hint: `使用ASCII码`
+            hint: `Use ASCII codes`
         };
     }
 
@@ -390,7 +391,7 @@ class QuizManager {
         const prob = (freqA / total).toFixed(2);
 
         return {
-            question: `符号频率 a:${freqA}, b:${freqB}，a的概率？`,
+            question: `Symbol frequencies: a:${freqA}, b:${freqB}. What is the probability of a?`,
             answer: prob,
             hint: `${freqA}/${total}`
         };
@@ -402,7 +403,7 @@ class QuizManager {
         const compressed = Math.round(original / ratio);
 
         return {
-            question: `原始 ${original} 字节，压缩后 ${compressed} 字节，压缩比？`,
+            question: `Original size: ${original} bytes. Compressed size: ${compressed} bytes. What is the compression ratio?`,
             answer: `${ratio}:1`,
             hint: `${original}/${compressed}`
         };
@@ -421,9 +422,9 @@ class QuizManager {
         const mb = (bytes/1024/1024).toFixed(2);
 
         return {
-            question: `${sr/1000}kHz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}, ${dur}秒，大小(MB)？`,
+            question: `${sr/1000}kHz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}, ${dur}s. What is the size in MB?`,
             answer: mb,
-            hint: `采样率*位深/8*声道*时长 /1024/1024`
+            hint: `SampleRate*BitDepth/8*Channels*Duration /1024/1024`
         };
     }
 
@@ -439,7 +440,7 @@ class QuizManager {
         const secs = bytes / (sr * (bd/8) * ch);
 
         return {
-            question: `${mb}MB, ${sr/1000}kHz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}，时长(秒)？`,
+            question: `${mb}MB file at ${sr/1000}kHz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}. Duration in seconds?`,
             answer: secs.toFixed(1),
             hint: `${mb}*1024*1024 / (${sr}*${bd/8}*${ch})`
         };
@@ -456,7 +457,7 @@ class QuizManager {
         const kbps = (bps / 1000).toFixed(0);
 
         return {
-            question: `${sr}Hz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}，比特率(kbps)？`,
+            question: `${sr}Hz, ${bd}bit, ${ch === 1 ? 'mono' : 'stereo'}. Bitrate in kbps?`,
             answer: kbps,
             hint: `${sr}*${bd}*${ch}/1000`
         };
@@ -469,7 +470,7 @@ class QuizManager {
         const db = type === 'amplitude' ? 20*Math.log10(v) : 10*Math.log10(v);
 
         return {
-            question: `功率比 ${v} 的dB值？（功率计算）`,
+            question: `What is the dB value for power ratio ${v}? (Use power calculation)`,
             answer: db.toFixed(2),
             hint: `10*log10(${v})`
         };

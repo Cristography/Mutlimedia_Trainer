@@ -884,7 +884,7 @@ class App {
         if (hash === '' || hash === '#' || hash === '#home') {
             homeSection.style.display = 'block';
             toolsIndex.style.display = 'block';
-            allToolsSection.style.display = 'block';
+            allToolsSection.style.display = 'none';
         } else if (hash.startsWith('#tool-')) {
             const toolId = hash.substring(1);
             if (ToolsData[toolId]) {
